@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px; /* Letra pequeña */
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .table-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Tabla de Alertas</h2>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>alertaid</th>
+                <th>codalerta</th>
+                <th>nombre</th>
+                <th>sentenciaId</th>
+                <th>inicioevento</th>
+                <th>identificacionalerta</th>
+                <th>nombreActivo</th>
+                <th>proceso</th>
+                <th>latencia</th>
+                <th>tipoServicio</th>
+                <th>CI</th>
+                <th>Subtiposervicio</th>
+                <th>jitter</th>
+                <th>disponibilidad</th>
+                <th>packetlost</th>
+                <th>rssi</th>
+                <th>nsr</th>
+                <th>PLM</th>
+                <th>tipoExWa</th>
+                <th>codigoEvento</th>
+                <th>descripcionevento</th>
+                <th>Origen</th>
+                <th>tipodocumento</th>
+                <th>estado</th>
+                <th>resumen</th>
+                <th>titulo</th>
+                <th>numero</th>
+                <th>fechaestado</th>
+                <th>razonestado</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí puedes añadir filas con los datos -->
+            <tr>
+                <td>1</td>
+                <td>ALERT001</td>
+                <td>Alerta Ejemplo</td>
+                <td>101</td>
+                <td>2024-08-23 14:30:00</td>
+                <td>2024-08-23 15:00:00</td>
+                <td>Activo 1</td>
+                <td>Proceso 1</td>
+                <td>100</td>
+                <td>Servicio A</td>
+                <td>CI001</td>
+                <td>Subtipo A</td>
+                <td>50</td>
+                <td>99</td>
+                <td>0</td>
+                <td>-85</td>
+                <td>10</td>
+                <td>50</td>
+                <td>ExWa A</td>
+                <td>EVT001</td>
+                <td>Evento X</td>
+                <td>Origen A</td>
+                <td>DNI</td>
+                <td>Activo</td>
+                <td>Resumen ejemplo</td>
+                <td>Título de alerta</td>
+                <td>001</td>
+                <td>2024-08-23 16:00:00</td>
+                <td>Razon 1</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

@@ -51,21 +51,21 @@ public class MainSwing
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        // Configuración de las secciones para que ocupen una parte menor de la pantalla
+        // Configuración de las secciones para que ocupen menos espacio en la pantalla
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-        sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
+        sectionsPanel.setBorder(new EmptyBorder(10, 0, 10, 0));  // Reducimos los márgenes para dar más espacio a las tablas
 
         for (int i = 1; i <= 8; i++) {
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode("#cccccc"));
-            sectionPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Espaciado interno
+            sectionPanel.setBorder(new EmptyBorder(5, 5, 5, 5));  // Reducimos los bordes internos
 
             // Contenido de la sección
             JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
-            sectionLabel.setFont(new Font("Arial", Font.PLAIN, 14)); // Letra más pequeña
+            sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12));  // Reducimos la fuente
 
             JLabel alertLabel = new JLabel("Alert " + (char) (64 + i), SwingConstants.CENTER);
-            alertLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Letra más pequeña
+            alertLabel.setFont(new Font("Arial", Font.PLAIN, 10));  // Reducimos la fuente
 
             JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
             labelsPanel.setOpaque(false); // Mantener el fondo de la sección
@@ -76,11 +76,11 @@ public class MainSwing
             JButton changeColorButton = new JButton("Cambiar Color");
             changeColorButton.setBackground(Color.decode("#009dad"));
             changeColorButton.setForeground(Color.WHITE);
-            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 12));
+            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 10));
             changeColorButton.setMargin(new Insets(0, 0, 0, 0));
             changeColorButton.setBorderPainted(false);
             changeColorButton.setFocusPainted(false);
-            changeColorButton.setPreferredSize(new Dimension(120, 30));
+            changeColorButton.setPreferredSize(new Dimension(100, 25));  // Reducimos el tamaño del botón
 
             changeColorButton.addActionListener(new ActionListener() {
                 @Override
@@ -94,11 +94,11 @@ public class MainSwing
             JButton changeTitleButton = new JButton("Cambiar Título");
             changeTitleButton.setBackground(Color.decode("#f39c12"));
             changeTitleButton.setForeground(Color.WHITE);
-            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 12));
+            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 10));
             changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
             changeTitleButton.setBorderPainted(false);
             changeTitleButton.setFocusPainted(false);
-            changeTitleButton.setPreferredSize(new Dimension(120, 30));
+            changeTitleButton.setPreferredSize(new Dimension(100, 25));  // Reducimos el tamaño del botón
 
             changeTitleButton.addActionListener(new ActionListener() {
                 @Override
@@ -125,60 +125,105 @@ public class MainSwing
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1;
-        gbc.weighty = 0.4; // Las secciones ocupan el 40% del espacio vertical
+        gbc.weighty = 0.25; // Las secciones ocupan ahora el 25% del espacio vertical
         gbc.fill = GridBagConstraints.BOTH;
         contentPanel.add(sectionsPanel, gbc);
 
-        // Configuración de las tablas para que ocupen más espacio en la pantalla
-        JPanel tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+       // Configuración de las tablas para que ocupen más espacio en la pantalla
+JPanel tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 
-        // Tabla de alertas
-        String[] alertColumns = { "ID", "Tipo de Ventana", "Predicción", "Evento", "Causa" };
-        Object[][] alertData = {
-                { 1, "Ventana A", "Alta", "Evento X", "Causa 1" },
-                { 2, "Ventana B", "Media", "Evento Y", "Causa 2" }
-        };
-        JTable alertTable = new JTable(new DefaultTableModel(alertData, alertColumns));
-        JScrollPane alertScrollPane = new JScrollPane(alertTable);
-        JPanel alertTablePanel = new JPanel(new BorderLayout());
-        alertTablePanel.add(new JLabel("Alertas", JLabel.CENTER), BorderLayout.NORTH);
-        alertTablePanel.add(alertScrollPane, BorderLayout.CENTER);
+// Tabla de alertas con scroll horizontal
+String[] alertColumns = { 
+    "ID", "Tipo de Ventana", "Predicción", "Evento", "Causa", "Inicio Evento", "Identificación Alerta", 
+    "Nombre Activo", "Proceso", "Latencia", "Tipo de Servicio", "CI", "Subtipo Servicio", 
+    "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa", 
+    "Código Evento", "Descripción Evento", "Origen", "Tipo Documento", "Estado", "Resumen", 
+    "Título", "Número", "Fecha Estado", "Razón Estado" 
+};
+Object[][] alertData = {
+    { 1, "Ventana A", "Alta", "Evento X", "Causa 1", "2024-08-23", "Identificación 1", 
+      "Activo 1", "Proceso 1", 100, "Servicio A", "CI001", "Subtipo A", 
+      50, 99, 0, -85, 10, 50, "ExWa A", "EVT001", "Descripción X", "Origen A", "DNI", 
+      "Activo", "Resumen ejemplo", "Título de alerta", "001", "2024-08-23", "Razón 1" }
+};
+JTable alertTable = new JTable(new DefaultTableModel(alertData, alertColumns));
+JScrollPane alertScrollPane = new JScrollPane(alertTable);
 
-        // Tabla de eventos anteriores
-        String[] eventColumns = { "#", "First", "Last", "Handle" };
-        Object[][] eventData = {
-                { 1, "Mark", "Otto", "@mdo" },
-                { 2, "Jacob", "Thornton", "@fat" }
-        };
-        JTable previousEventTable = new JTable(new DefaultTableModel(eventData, eventColumns));
-        JScrollPane previousEventScrollPane = new JScrollPane(previousEventTable);
-        JPanel previousEventTablePanel = new JPanel(new BorderLayout());
-        previousEventTablePanel.add(new JLabel("Eventos Anteriores", JLabel.CENTER), BorderLayout.NORTH);
-        previousEventTablePanel.add(previousEventScrollPane, BorderLayout.CENTER);
+// Habilitar el scroll horizontal
+alertScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+alertTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        // Tabla de eventos siguientes
-        JTable nextEventTable = new JTable(new DefaultTableModel(eventData, eventColumns));
-        JScrollPane nextEventScrollPane = new JScrollPane(nextEventTable);
-        JPanel nextEventTablePanel = new JPanel(new BorderLayout());
-        nextEventTablePanel.add(new JLabel("Eventos Siguientes", JLabel.CENTER), BorderLayout.NORTH);
-        nextEventTablePanel.add(nextEventScrollPane, BorderLayout.CENTER);
+// Fijar el tamaño inicial de las columnas que se mostrarán al principio
+alertTable.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
+alertTable.getColumnModel().getColumn(1).setPreferredWidth(150); // Tipo de Ventana
+alertTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Predicción
+alertTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Evento
 
-        tablesPanel.add(alertTablePanel);
-        tablesPanel.add(previousEventTablePanel);
-        tablesPanel.add(nextEventTablePanel);
+JPanel alertTablePanel = new JPanel(new BorderLayout());
+alertTablePanel.add(new JLabel("Alertas", JLabel.CENTER), BorderLayout.NORTH);
+alertTablePanel.add(alertScrollPane, BorderLayout.CENTER);
 
-        // Añadir tablas al GridBagLayout
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weighty = 0.6; // Las tablas ocupan el 60% del espacio vertical
-        contentPanel.add(tablesPanel, gbc);
+// Tabla de eventos anteriores con scroll horizontal
+String[] eventColumns = { 
+    "#", "First", "Last", "Handle", "Evento", "Descripción", "Fecha", "Estado" 
+};
+Object[][] eventData = {
+    { 1, "Mark", "Otto", "@mdo", "Evento X", "Descripción Evento X", "2024-08-23", "Activo" },
+    { 2, "Jacob", "Thornton", "@fat", "Evento Y", "Descripción Evento Y", "2024-08-22", "Inactivo" }
+};
+JTable previousEventTable = new JTable(new DefaultTableModel(eventData, eventColumns));
+JScrollPane previousEventScrollPane = new JScrollPane(previousEventTable);
 
-        // Añadir el panel principal y el contenido al frame
-        mainPanel.add(header, BorderLayout.NORTH);
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
+// Habilitar el scroll horizontal
+previousEventScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+previousEventTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        frame.add(mainPanel);
-        frame.setVisible(true);
+// Fijar el tamaño inicial de las columnas que se mostrarán al principio
+previousEventTable.getColumnModel().getColumn(0).setPreferredWidth(50);  // #
+previousEventTable.getColumnModel().getColumn(1).setPreferredWidth(100); // First
+previousEventTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Last
+previousEventTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Handle
+
+JPanel previousEventTablePanel = new JPanel(new BorderLayout());
+previousEventTablePanel.add(new JLabel("Eventos Anteriores", JLabel.CENTER), BorderLayout.NORTH);
+previousEventTablePanel.add(previousEventScrollPane, BorderLayout.CENTER);
+
+// Tabla de eventos siguientes con scroll horizontal
+JTable nextEventTable = new JTable(new DefaultTableModel(eventData, eventColumns));
+JScrollPane nextEventScrollPane = new JScrollPane(nextEventTable);
+
+// Habilitar el scroll horizontal
+nextEventScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+nextEventTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+// Fijar el tamaño inicial de las columnas que se mostrarán al principio
+nextEventTable.getColumnModel().getColumn(0).setPreferredWidth(50);  // #
+nextEventTable.getColumnModel().getColumn(1).setPreferredWidth(100); // First
+nextEventTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Last
+nextEventTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Handle
+
+JPanel nextEventTablePanel = new JPanel(new BorderLayout());
+nextEventTablePanel.add(new JLabel("Eventos Siguientes", JLabel.CENTER), BorderLayout.NORTH);
+nextEventTablePanel.add(nextEventScrollPane, BorderLayout.CENTER);
+
+// Añadir tablas al panel principal
+tablesPanel.add(alertTablePanel);
+tablesPanel.add(previousEventTablePanel);
+tablesPanel.add(nextEventTablePanel);
+
+// Añadir tablas al GridBagLayout
+gbc.gridx = 0;
+gbc.gridy = 1;
+gbc.weighty = 0.75; // Las tablas ahora ocupan el 75% del espacio vertical
+contentPanel.add(tablesPanel, gbc);
+
+// Añadir el panel principal y el contenido al frame
+mainPanel.add(header, BorderLayout.NORTH);
+mainPanel.add(contentPanel, BorderLayout.CENTER);
+
+frame.add(mainPanel);
+frame.setVisible(true);
+
 
         // Evento para abrir el diálogo de configuración de alerta
         configureAlertButton.addActionListener(new ActionListener() {
@@ -229,7 +274,7 @@ public class MainSwing
         configDialog.setVisible(true);
     }
 
-    // Método para mostrar el diálogo de configuración de alerta (dejado como estaba)
+    // Método para mostrar el diálogo de configuración de alerta
     private void showAlertConfigDialog(JFrame owner) {
         JDialog alertDialog = new JDialog(owner, "Configurar Alerta", true);
         alertDialog.setSize(400, 300);
@@ -262,7 +307,6 @@ public class MainSwing
         selectedColorButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Usar el modal que ya tenemos para la selección de color
                 showColorPickerModal(owner);
             }
         });
@@ -278,8 +322,7 @@ public class MainSwing
                 String forma = (String) shapeComboBox.getSelectedItem();
                 Color color = selectedColorButton.getBackground();
 
-                // Aquí puedes guardar las configuraciones en una estructura de datos o
-                // aplicarlas directamente
+                // Guardar las configuraciones en una estructura de datos
                 int tipoAlertaInt = Integer.parseInt(tipoAlerta);
                 alertaConfigs.put(tipoAlertaInt, new AlertaConfig(tipoAlertaInt, severidad, forma, color));
 
@@ -297,11 +340,10 @@ public class MainSwing
         configPanel.add(colorLabel);
         configPanel.add(selectedColorButton);
 
-        // Agregar el panel de configuración y el botón de guardar al diálogo
         alertDialog.add(configPanel, BorderLayout.CENTER);
         alertDialog.add(saveButton, BorderLayout.SOUTH);
 
-        alertDialog.setLocationRelativeTo(owner); // Centrar el diálogo
+        alertDialog.setLocationRelativeTo(owner);
         alertDialog.setVisible(true);
     }
 
