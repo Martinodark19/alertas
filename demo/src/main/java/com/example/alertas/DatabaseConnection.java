@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class DatabaseConnection {
 
-    // Cambia "alertas_db" al nombre de tu base de datos
+    // Cambiar al nombre de tu base de datos
     private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=alertas_db;integratedSecurity=true;encrypt=false;";
 
     // Método para obtener el último registro de la tabla alertas
@@ -28,16 +28,16 @@ public class DatabaseConnection {
                 lastAlert[5] = resultSet.getTimestamp("identificacionalerta");
                 lastAlert[6] = resultSet.getString("nombreActivo");
                 lastAlert[7] = resultSet.getString("proceso");
-                lastAlert[8] = resultSet.getBigDecimal("latencia"); // Cambiado a BigDecimal para tipo NUMERIC
+                lastAlert[8] = resultSet.getBigDecimal("latencia"); 
                 lastAlert[9] = resultSet.getString("tipoServicio");
                 lastAlert[10] = resultSet.getString("CI");
                 lastAlert[11] = resultSet.getString("Subtiposervicio");
-                lastAlert[12] = resultSet.getBigDecimal("jitter"); // Cambiado a BigDecimal para tipo NUMERIC
-                lastAlert[13] = resultSet.getBigDecimal("disponibilidad"); // Cambiado a BigDecimal para tipo NUMERIC
-                lastAlert[14] = resultSet.getBigDecimal("packetlost"); // Cambiado a BigDecimal para tipo NUMERIC
-                lastAlert[15] = resultSet.getBigDecimal("rssi"); // Cambiado a BigDecimal para tipo NUMERIC
-                lastAlert[16] = resultSet.getBigDecimal("nsr"); // Cambiado a BigDecimal para tipo NUMERIC
-                lastAlert[17] = resultSet.getBigDecimal("PLM"); // Cambiado a BigDecimal para tipo NUMERIC
+                lastAlert[12] = resultSet.getBigDecimal("jitter"); 
+                lastAlert[13] = resultSet.getBigDecimal("disponibilidad"); 
+                lastAlert[14] = resultSet.getBigDecimal("packetlost"); 
+                lastAlert[15] = resultSet.getBigDecimal("rssi"); 
+                lastAlert[16] = resultSet.getBigDecimal("nsr"); 
+                lastAlert[17] = resultSet.getBigDecimal("PLM"); 
                 lastAlert[18] = resultSet.getString("tipoExWa");
                 lastAlert[19] = resultSet.getString("codigoEvento");
                 lastAlert[20] = resultSet.getString("descripcionevento");

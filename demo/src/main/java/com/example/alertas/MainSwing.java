@@ -13,19 +13,20 @@ import java.util.Map;
 public class MainSwing {
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
-    private Map<Integer, AlertaConfig> alertaConfigs = new HashMap<>(); // Mapa para almacenar configuraciones de
-                                                                        // alertas
+    private Map<Integer, AlertaConfig> alertaConfigs = new HashMap<>(); // Mapa para almacenar configuraciones de alertas
     private JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
 
     private DatabaseConnection databaseConnection;
 
-    public MainSwing(DatabaseConnection databaseConnection) {
+    public MainSwing(DatabaseConnection databaseConnection) 
+    {
         this.databaseConnection = databaseConnection;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         SwingUtilities.invokeLater(MainSwing::new);
     }
 
@@ -90,9 +91,11 @@ public class MainSwing {
             changeColorButton.setFocusPainted(false);
             changeColorButton.setPreferredSize(new Dimension(100, 25)); // Reducimos el tamaño del botón
 
-            changeColorButton.addActionListener(new ActionListener() {
+            changeColorButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) 
+                {
                     selectedSection = sectionPanel;
                     showColorPickerModal(frame);
                 }
@@ -108,9 +111,11 @@ public class MainSwing {
             changeTitleButton.setFocusPainted(false);
             changeTitleButton.setPreferredSize(new Dimension(100, 25)); // Reducimos el tamaño del botón
 
-            changeTitleButton.addActionListener(new ActionListener() {
+            changeTitleButton.addActionListener(new ActionListener() 
+            {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) 
+                {
                     selectedSectionLabel = sectionLabel;
                     showTitleChangeModal(frame);
                 }
@@ -179,7 +184,8 @@ public class MainSwing {
 
         // aqui ira la llamada a la base de datos para la tabla alertas
 
-        for (int i = 0; i < lastAlert.length; i = i + 1) {
+        for (int i = 0; i < lastAlert.length; i = i + 1) 
+        {
             lastAlert[i] = "No contenido";
         }
 
@@ -187,10 +193,12 @@ public class MainSwing {
         alertTableModel.addRow(lastAlert);
 
         // Crear una instancia del Timer
-        Timer timer = new Timer(2000, new ActionListener() {
+        Timer timer = new Timer(2000, new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (databaseConnection.fetchLastAlert() != null) {
+                if (databaseConnection.fetchLastAlert() != null) 
+                {
                     // Limpiar el modelo actual
                     alertTableModel.setRowCount(0);
 
@@ -200,7 +208,8 @@ public class MainSwing {
                     // Notificar a la tabla que los datos han cambiado
                     alertTableModel.fireTableDataChanged();
 
-                    for (int i = 0; i < lastAlert.length; i = i + 1) {
+                    for (int i = 0; i < lastAlert.length; i = i + 1) 
+                    {
                         lastAlert[i] = databaseConnection.fetchLastAlert()[i];
                     }
 
@@ -231,7 +240,8 @@ public class MainSwing {
         alertTablePanel.add(alertScrollPane, BorderLayout.CENTER);
 
         // Tabla de eventos anteriores con scroll horizontal
-        String[] eventColumns = {
+        String[] eventColumns = 
+        {
                 "#", "First", "Last", "Handle", "Evento", "Descripción", "Fecha", "Estado"
         };
         Object[][] eventData = {
