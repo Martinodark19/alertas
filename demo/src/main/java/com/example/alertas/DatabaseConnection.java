@@ -16,8 +16,7 @@ public class DatabaseConnection {
                 PreparedStatement statement = connection.prepareStatement(query);
                 ResultSet resultSet = statement.executeQuery()) {
 
-            if (resultSet.next()) 
-            {
+            if (resultSet.next()) {
                 lastAlert = new Object[30]; // Ajustar tamaño según el número de columnas de la tabla alertas
 
                 lastAlert[0] = resultSet.getInt("alertaid");
@@ -28,16 +27,16 @@ public class DatabaseConnection {
                 lastAlert[5] = resultSet.getTimestamp("identificacionalerta");
                 lastAlert[6] = resultSet.getString("nombreActivo");
                 lastAlert[7] = resultSet.getString("proceso");
-                lastAlert[8] = resultSet.getBigDecimal("latencia"); 
+                lastAlert[8] = resultSet.getBigDecimal("latencia");
                 lastAlert[9] = resultSet.getString("tipoServicio");
                 lastAlert[10] = resultSet.getString("CI");
                 lastAlert[11] = resultSet.getString("Subtiposervicio");
-                lastAlert[12] = resultSet.getBigDecimal("jitter"); 
-                lastAlert[13] = resultSet.getBigDecimal("disponibilidad"); 
-                lastAlert[14] = resultSet.getBigDecimal("packetlost"); 
-                lastAlert[15] = resultSet.getBigDecimal("rssi"); 
-                lastAlert[16] = resultSet.getBigDecimal("nsr"); 
-                lastAlert[17] = resultSet.getBigDecimal("PLM"); 
+                lastAlert[12] = resultSet.getBigDecimal("jitter");
+                lastAlert[13] = resultSet.getBigDecimal("disponibilidad");
+                lastAlert[14] = resultSet.getBigDecimal("packetlost");
+                lastAlert[15] = resultSet.getBigDecimal("rssi");
+                lastAlert[16] = resultSet.getBigDecimal("nsr");
+                lastAlert[17] = resultSet.getBigDecimal("PLM");
                 lastAlert[18] = resultSet.getString("tipoExWa");
                 lastAlert[19] = resultSet.getString("codigoEvento");
                 lastAlert[20] = resultSet.getString("descripcionevento");
