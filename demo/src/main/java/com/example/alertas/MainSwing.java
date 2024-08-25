@@ -3,30 +3,37 @@ package com.example.alertas;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import com.example.header.AlertasConfig;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 public class MainSwing {
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
-    private Map<Integer, AlertaConfig> alertaConfigs = new HashMap<>(); // Mapa para almacenar configuraciones de alertas
     private JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
 
-    private DatabaseConnection databaseConnection;
+    private Map<String, AlertasConfig> alertConfigMap = new HashMap<>();
 
-    public MainSwing(DatabaseConnection databaseConnection) 
-    {
+    // inicializar variable para almacenar figuras
+
+    private DatabaseConnection databaseConnection;
+    private AlertasConfig alertaConfig;
+
+    public MainSwing(DatabaseConnection databaseConnection, AlertasConfig alertaConfig) {
         this.databaseConnection = databaseConnection;
+        this.alertaConfig = alertaConfig;
     }
 
-    public static void main(String[] args) 
-    {
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(MainSwing::new);
     }
 
@@ -91,11 +98,9 @@ public class MainSwing {
             changeColorButton.setFocusPainted(false);
             changeColorButton.setPreferredSize(new Dimension(100, 25)); // Reducimos el tamaño del botón
 
-            changeColorButton.addActionListener(new ActionListener() 
-            {
+            changeColorButton.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) 
-                {
+                public void actionPerformed(ActionEvent e) {
                     selectedSection = sectionPanel;
                     showColorPickerModal(frame);
                 }
@@ -111,11 +116,9 @@ public class MainSwing {
             changeTitleButton.setFocusPainted(false);
             changeTitleButton.setPreferredSize(new Dimension(100, 25)); // Reducimos el tamaño del botón
 
-            changeTitleButton.addActionListener(new ActionListener() 
-            {
+            changeTitleButton.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) 
-                {
+                public void actionPerformed(ActionEvent e) {
                     selectedSectionLabel = sectionLabel;
                     showTitleChangeModal(frame);
                 }
@@ -184,8 +187,7 @@ public class MainSwing {
 
         // aqui ira la llamada a la base de datos para la tabla alertas
 
-        for (int i = 0; i < lastAlert.length; i = i + 1) 
-        {
+        for (int i = 0; i < lastAlert.length; i = i + 1) {
             lastAlert[i] = "No contenido";
         }
 
@@ -193,37 +195,30 @@ public class MainSwing {
         alertTableModel.addRow(lastAlert);
 
         // Crear una instancia del Timer
-        Timer timer = new Timer(2000, new ActionListener() 
-        {
+        Timer timer = new Timer(2000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (databaseConnection.fetchLastAlert() != null) 
-                {
+                if (databaseConnection.fetchLastAlert() != null) {
                     // Limpiar el modelo actual
                     alertTableModel.setRowCount(0);
 
-                            // Llenar la tabla con los valores iniciales
-                            alertTableModel.addRow(lastAlert);
+                    // Llenar la tabla con los valores iniciales
+                    alertTableModel.addRow(lastAlert);
 
                     // Notificar a la tabla que los datos han cambiado
                     alertTableModel.fireTableDataChanged();
 
-                    for (int i = 0; i < lastAlert.length; i = i + 1) 
-                    {
+                    for (int i = 0; i < lastAlert.length; i = i + 1) {
                         lastAlert[i] = databaseConnection.fetchLastAlert()[i];
                     }
 
                 }
                 // Aquí va el código que quieres ejecutar cada 2 segundos
-                System.out.println("Tarea ejecutada: " + System.currentTimeMillis());
+                // System.out.println("Tarea ejecutada: " + System.currentTimeMillis());
             }
         });
         // Iniciar el temporizador
         timer.start();
-
-
-
-
 
         // Habilitar el scroll horizontal
         alertScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -240,8 +235,7 @@ public class MainSwing {
         alertTablePanel.add(alertScrollPane, BorderLayout.CENTER);
 
         // Tabla de eventos anteriores con scroll horizontal
-        String[] eventColumns = 
-        {
+        String[] eventColumns = {
                 "#", "First", "Last", "Handle", "Evento", "Descripción", "Fecha", "Estado"
         };
         Object[][] eventData = {
@@ -350,6 +344,9 @@ public class MainSwing {
         configDialog.setVisible(true);
     }
 
+    // Mapa para almacenar configuraciones de alerta
+    // private Map<String, AlertaConfig> alertConfigMap = new HashMap<>();
+
     // Método para mostrar el diálogo de configuración de alerta
     private void showAlertConfigDialog(JFrame owner) {
         JDialog alertDialog = new JDialog(owner, "Configurar Alerta", true);
@@ -398,13 +395,43 @@ public class MainSwing {
                 String forma = (String) shapeComboBox.getSelectedItem();
                 Color color = selectedColorButton.getBackground();
 
-                // Guardar las configuraciones en una estructura de datos
-                int tipoAlertaInt = Integer.parseInt(tipoAlerta);
-                alertaConfigs.put(tipoAlertaInt, new AlertaConfig(tipoAlertaInt, severidad, forma, color));
+                // System.out.println(tipoAlerta);
+                // Crear una nueva instancia de AlertaConfig y almacenarla en el mapa
+                AlertasConfig saveInstanceAlerts = new AlertasConfig(tipoAlerta, severidad, forma, color);
+
+                alertConfigMap.put(tipoAlerta, saveInstanceAlerts); // Almacenar en memoria
+                System.out.println(saveInstanceAlerts.getTipoAlerta());
+
+                // Verificar si ya existe una configuración para el tipo de alerta
+                // AlertaConfig config = alertConfigMap.get(tipoAlerta);
+
+                // Usamos el tipo de alerta como clave para el mapa
+                // alertConfigMap.put(tipoAlerta, config);
 
                 alertDialog.dispose(); // Cierra el diálogo después de guardar
+
+                // Mostrar un mensaje de éxito
+                JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
+
             }
         });
+
+        // Comprobar si ya hay una configuración guardada para el tipo de alerta
+        // seleccionado
+        String tipoAlertaSeleccionada = (String) alertTypeComboBox.getSelectedItem();
+        AlertasConfig configuracionGuardada = alertConfigMap.get(tipoAlertaSeleccionada);
+
+        if (configuracionGuardada != null) {
+            // Si hay una configuración guardada, rellenar los campos con los valores
+            // almacenados
+            alertTypeComboBox.setSelectedItem(tipoAlertaSeleccionada);
+            severityComboBox.setSelectedItem(configuracionGuardada.getSeveridad());
+            shapeComboBox.setSelectedItem(configuracionGuardada.getForma());
+            selectedColorButton.setBackground(configuracionGuardada.getColor());
+        }
+        // System.out.println(configuracionGuardada);
+        // System.out.println(alertConfigMap);
+        // System.out.println(tipoAlertaSeleccionada);
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);
@@ -495,21 +522,4 @@ public class MainSwing {
         });
         return button;
     }
-}
-
-// Clase para almacenar la configuración de cada alerta
-class AlertaConfig {
-    int tipoAlerta;
-    String severidad;
-    String forma;
-    Color color;
-
-    public AlertaConfig(int tipoAlerta, String severidad, String forma, Color color) {
-        this.tipoAlerta = tipoAlerta;
-        this.severidad = severidad;
-        this.forma = forma;
-        this.color = color;
-    }
-
-    // Getters y Setters si es necesario
 }
