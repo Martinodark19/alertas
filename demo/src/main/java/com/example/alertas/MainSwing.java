@@ -67,13 +67,13 @@ public class MainSwing {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
-        JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-        sectionsPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
+        JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
         for (int i = 1; i <= 8; i++) {
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode("#cccccc"));
-            sectionPanel.setBorder(new EmptyBorder(5, 5, 5, 5)); // Reducimos los bordes internos
+            sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
 
             // Contenido de la sección
             JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
@@ -91,11 +91,11 @@ public class MainSwing {
             JButton changeColorButton = new JButton("Cambiar Color");
             changeColorButton.setBackground(Color.decode("#009dad"));
             changeColorButton.setForeground(Color.WHITE);
-            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 10));
+            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 8));
             changeColorButton.setMargin(new Insets(0, 0, 0, 0));
             changeColorButton.setBorderPainted(false);
             changeColorButton.setFocusPainted(false);
-            changeColorButton.setPreferredSize(new Dimension(100, 25)); // Reducimos el tamaño del botón
+            changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
 
             changeColorButton.addActionListener(new ActionListener() {
                 @Override
@@ -109,11 +109,11 @@ public class MainSwing {
             JButton changeTitleButton = new JButton("Cambiar Título");
             changeTitleButton.setBackground(Color.decode("#f39c12"));
             changeTitleButton.setForeground(Color.WHITE);
-            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 10));
+            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 8));
             changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
             changeTitleButton.setBorderPainted(false);
             changeTitleButton.setFocusPainted(false);
-            changeTitleButton.setPreferredSize(new Dimension(100, 25)); // Reducimos el tamaño del botón
+            changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
 
             changeTitleButton.addActionListener(new ActionListener() {
                 @Override
@@ -123,17 +123,28 @@ public class MainSwing {
                 }
             });
 
-            // Panel para los botones
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
+            // otro
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
             buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
+
+            // Alinear los botones a la derecha dentro del panel vertical
             buttonPanel.add(changeColorButton);
+            buttonPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Espacio entre los botones
             buttonPanel.add(changeTitleButton);
 
-            // Añadir el contenido y el botón al panel de la sección
+            // Crear un panel envolvente que colocará los botones alineados a la derecha
+            JPanel wrapperPanel = new JPanel(new BorderLayout());
+            wrapperPanel.setOpaque(false); // Mantener el fondo del panel transparente
+            wrapperPanel.add(buttonPanel, BorderLayout.EAST); // Colocar los botones a la derecha
+
+            // Añadir el contenido central y el wrapperPanel en la sección
             sectionPanel.add(labelsPanel, BorderLayout.CENTER);
-            sectionPanel.add(buttonPanel, BorderLayout.SOUTH);
+            sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
 
             sectionsPanel.add(sectionPanel);
+
         }
 
         // Añadir secciones al GridBagLayout
@@ -326,7 +337,6 @@ public class MainSwing {
         // Usar un JFormattedTextField para asegurarse de que solo se ingresen números
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         JFormattedTextField msField = new JFormattedTextField(numberFormat);
-        System.out.println("Frecuencia predeterminada: " + configuracion.getUpdateFrequency());
         msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
 
         JButton applyButton = new JButton("Guardar");
@@ -337,16 +347,23 @@ public class MainSwing {
 
                 // obtener milisegundos limpio
                 Number value = (Number) msField.getValue();
-                int updateFrequency = value.intValue();
 
-                configuracion.setUpdateFrequency(updateFrequency);
+                if (value != null) {
+                    int updateFrequency = value.intValue();
 
-                // System.out.println(updateFrequency);
+                    configuracion.setUpdateFrequency(updateFrequency);
+                    configDialog.dispose(); // Cierra el diálogo después de guardar
 
-                configDialog.dispose(); // Cierra el diálogo después de guardar
+                    // Mostrar un mensaje de éxito
+                    JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
 
-                // Mostrar un mensaje de éxito
-                JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
+                } else {
+                    configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacio
+
+                    JOptionPane.showMessageDialog(owner,
+                            "El campo no puede quedar vacío. Por favor, reintente con un número válido.");
+
+                }
 
             }
         });
