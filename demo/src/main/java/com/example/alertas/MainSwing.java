@@ -26,11 +26,11 @@ public class MainSwing {
     // inicializar variable para almacenar figuras
 
     private DatabaseConnection databaseConnection;
-    private AlertasConfig alertaConfig;
+    // private AlertasConfig alertaConfig;
+    AlertasConfig alertaConfig = new AlertasConfig();
 
-    public MainSwing(DatabaseConnection databaseConnection, AlertasConfig alertaConfig) {
+    public MainSwing(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
-        this.alertaConfig = alertaConfig;
     }
 
     public static void main(String[] args) {
@@ -385,6 +385,7 @@ public class MainSwing {
         });
 
         // Botón para guardar
+
         JButton saveButton = new JButton("Guardar");
 
         saveButton.addActionListener(new ActionListener() {
@@ -395,43 +396,34 @@ public class MainSwing {
                 String forma = (String) shapeComboBox.getSelectedItem();
                 Color color = selectedColorButton.getBackground();
 
-                // System.out.println(tipoAlerta);
-                // Crear una nueva instancia de AlertaConfig y almacenarla en el mapa
-                AlertasConfig saveInstanceAlerts = new AlertasConfig(tipoAlerta, severidad, forma, color);
 
-                alertConfigMap.put(tipoAlerta, saveInstanceAlerts); // Almacenar en memoria
-                System.out.println(saveInstanceAlerts.getTipoAlerta());
+                alertaConfig.setTipoAlerta(tipoAlerta); // Establecer el tipo de alerta
+                alertaConfig.setSeveridad(severidad); // Establecer la severidad
+                alertaConfig.setForma(forma); // Establecer la forma
+                alertaConfig.setColor(color); // Establecer el color
 
-                // Verificar si ya existe una configuración para el tipo de alerta
-                // AlertaConfig config = alertConfigMap.get(tipoAlerta);
-
-                // Usamos el tipo de alerta como clave para el mapa
-                // alertConfigMap.put(tipoAlerta, config);
+                // alertConfigMap.put(tipoAlerta, alertaConfig);
 
                 alertDialog.dispose(); // Cierra el diálogo después de guardar
 
                 // Mostrar un mensaje de éxito
                 JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
+                // alertConfigMap.put(tipoAlerta, saveInstanceAlerts); // Almacenar en memoria
 
             }
         });
 
-        // Comprobar si ya hay una configuración guardada para el tipo de alerta
-        // seleccionado
         String tipoAlertaSeleccionada = (String) alertTypeComboBox.getSelectedItem();
-        AlertasConfig configuracionGuardada = alertConfigMap.get(tipoAlertaSeleccionada);
 
-        if (configuracionGuardada != null) {
-            // Si hay una configuración guardada, rellenar los campos con los valores
-            // almacenados
-            alertTypeComboBox.setSelectedItem(tipoAlertaSeleccionada);
-            severityComboBox.setSelectedItem(configuracionGuardada.getSeveridad());
-            shapeComboBox.setSelectedItem(configuracionGuardada.getForma());
-            selectedColorButton.setBackground(configuracionGuardada.getColor());
-        }
-        // System.out.println(configuracionGuardada);
-        // System.out.println(alertConfigMap);
-        // System.out.println(tipoAlertaSeleccionada);
+        System.out.println(alertaConfig.getTipoAlerta());
+        System.out.println(alertaConfig.getSeveridad());
+        System.out.println(alertaConfig.getForma());
+        System.out.println(alertaConfig.getColor());
+
+        alertTypeComboBox.setSelectedItem(alertaConfig.getTipoAlerta());
+        severityComboBox.setSelectedItem(alertaConfig.getSeveridad());
+        shapeComboBox.setSelectedItem(alertaConfig.getForma());
+        selectedColorButton.setBackground(alertaConfig.getColor());
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);

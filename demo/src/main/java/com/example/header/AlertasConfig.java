@@ -4,19 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.awt.Color; // Importa el paquete Color
 
-
 public class AlertasConfig 
 {
-
-
     private String tipoAlerta;
     private String severidad;
     private String forma;
     private Color color;
 
+       // Constructor vacío con valores por defecto
+       public AlertasConfig() 
+       {
+        this.tipoAlerta = "3"; // Valor por defecto
+        this.severidad = "Media"; // Valor por defecto
+        this.forma = "Círculo"; // Valor por defecto
+        this.color = Color.GRAY; // Color por defecto
+       }
+
+
     // Constructor que acepta todos los parámetros
-    public AlertasConfig(String tipoAlerta, String severidad, String forma, Color color) 
-    {
+    public AlertasConfig(String tipoAlerta, String severidad, String forma, Color color) {
         this.tipoAlerta = tipoAlerta;
         this.severidad = severidad;
         this.forma = forma;
