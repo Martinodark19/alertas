@@ -5,14 +5,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import com.example.header.AlertasConfig;
+import com.example.header.Configuracion;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.LinkedHashMap;
 
 public class MainSwing {
     private JPanel selectedSection;
@@ -21,13 +19,15 @@ public class MainSwing {
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
 
-    private Map<String, AlertasConfig> alertConfigMap = new HashMap<>();
-
-    // inicializar variable para almacenar figuras
-
     private DatabaseConnection databaseConnection;
-    // private AlertasConfig alertaConfig;
+
+    // instancia para almacenar configurar alerta del header
     AlertasConfig alertaConfig = new AlertasConfig();
+
+    // instancia para almacenar configuracion del header
+    Configuracion configuracion = new Configuracion();
+
+    // instancia para guardar
 
     public MainSwing(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -68,8 +68,7 @@ public class MainSwing {
 
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-        sectionsPanel.setBorder(new EmptyBorder(10, 0, 10, 0)); // Reducimos los márgenes para dar más espacio a las
-                                                                // tablas
+        sectionsPanel.setBorder(new EmptyBorder(10, 0, 10, 0));
 
         for (int i = 1; i <= 8; i++) {
             JPanel sectionPanel = new JPanel(new BorderLayout());
@@ -327,10 +326,33 @@ public class MainSwing {
         // Usar un JFormattedTextField para asegurarse de que solo se ingresen números
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         JFormattedTextField msField = new JFormattedTextField(numberFormat);
-        msField.setValue(1000); // Valor predeterminado
-        msField.setColumns(10);
+        System.out.println("Frecuencia predeterminada: " + configuracion.getUpdateFrequency());
+        msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
 
         JButton applyButton = new JButton("Guardar");
+
+        applyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // obtener milisegundos limpio
+                Number value = (Number) msField.getValue();
+                int updateFrequency = value.intValue();
+
+                configuracion.setUpdateFrequency(updateFrequency);
+
+                // System.out.println(updateFrequency);
+
+                configDialog.dispose(); // Cierra el diálogo después de guardar
+
+                // Mostrar un mensaje de éxito
+                JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
+
+            }
+        });
+
+        // obtener los getters para guardar configuraciones en memoria
+        // configuracion.getUpdateFrequency();
 
         // Añadir los componentes al panel de configuración
         configPanel.add(msLabel);
@@ -343,9 +365,6 @@ public class MainSwing {
         configDialog.setLocationRelativeTo(owner); // Centrar el diálogo
         configDialog.setVisible(true);
     }
-
-    // Mapa para almacenar configuraciones de alerta
-    // private Map<String, AlertaConfig> alertConfigMap = new HashMap<>();
 
     // Método para mostrar el diálogo de configuración de alerta
     private void showAlertConfigDialog(JFrame owner) {
@@ -396,7 +415,6 @@ public class MainSwing {
                 String forma = (String) shapeComboBox.getSelectedItem();
                 Color color = selectedColorButton.getBackground();
 
-
                 alertaConfig.setTipoAlerta(tipoAlerta); // Establecer el tipo de alerta
                 alertaConfig.setSeveridad(severidad); // Establecer la severidad
                 alertaConfig.setForma(forma); // Establecer la forma
@@ -413,12 +431,7 @@ public class MainSwing {
             }
         });
 
-        String tipoAlertaSeleccionada = (String) alertTypeComboBox.getSelectedItem();
-
-        System.out.println(alertaConfig.getTipoAlerta());
-        System.out.println(alertaConfig.getSeveridad());
-        System.out.println(alertaConfig.getForma());
-        System.out.println(alertaConfig.getColor());
+        // String tipoAlertaSeleccionada = (String) alertTypeComboBox.getSelectedItem();
 
         alertTypeComboBox.setSelectedItem(alertaConfig.getTipoAlerta());
         severityComboBox.setSelectedItem(alertaConfig.getSeveridad());
