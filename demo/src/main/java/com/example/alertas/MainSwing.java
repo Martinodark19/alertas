@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.example.FigurasAlert;
 import com.example.header.AlertasConfig;
 import com.example.header.Configuracion;
 
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.List;
 
 public class MainSwing {
     private JPanel selectedSection;
@@ -26,6 +28,9 @@ public class MainSwing {
 
     // instancia para almacenar configuracion del header
     Configuracion configuracion = new Configuracion();
+
+    // instancia de las figuras
+    FigurasAlert figurasAlert = new FigurasAlert();
 
     // instancia para guardar
 
@@ -197,36 +202,35 @@ public class MainSwing {
 
         // aqui ira la llamada a la base de datos para la tabla alertas
 
-        for (int i = 0; i < lastAlert.length; i = i + 1) {
-            lastAlert[i] = "No contenido";
-        }
-
         // Llenar la tabla con los valores iniciales
         alertTableModel.addRow(lastAlert);
 
         // Crear una instancia del Timer
         Timer timer = new Timer(2000, new ActionListener() {
+            private int lastProcessedId = 0;
+
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (databaseConnection.fetchLastAlert() != null) {
-                    // Limpiar el modelo actual
-                    alertTableModel.setRowCount(0);
+                List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
-                    // Llenar la tabla con los valores iniciales
-                    alertTableModel.addRow(lastAlert);
+                if (!newAlerts.isEmpty()) {
+                    for (Object[] alert : newAlerts) {
+                        alertTableModel.insertRow(0, alert); // Inserta en la primera posición
 
-                    // Notificar a la tabla que los datos han cambiado
-                    alertTableModel.fireTableDataChanged();
+                        // logica para cambiar el color de la alerta segun su configuracion
+                        // figurasAlert.get
+                        // alertaConfig.getColor()
 
-                    for (int i = 0; i < lastAlert.length; i = i + 1) {
-                        lastAlert[i] = databaseConnection.fetchLastAlert()[i];
                     }
 
+                    // Actualizar el último alertaId procesado
+                    lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
+
+                    alertTableModel.fireTableDataChanged();
                 }
-                // Aquí va el código que quieres ejecutar cada 2 segundos
-                // System.out.println("Tarea ejecutada: " + System.currentTimeMillis());
             }
         });
+
         // Iniciar el temporizador
         timer.start();
 
@@ -338,6 +342,14 @@ public class MainSwing {
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         JFormattedTextField msField = new JFormattedTextField(numberFormat);
         msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
+
+        // Ajustar el tamaño visible del campo de entrada
+        // msField.setColumns(4); // Ajustar para que solo se puedan ver 4 dígitos como
+        // máximo
+
+        // Establecer el tamaño preferido para hacerlo más pequeño
+        // msField.setPreferredSize(new Dimension(50, 20)); // Ancho 50 píxeles, Alto 20
+        // píxeles
 
         JButton applyButton = new JButton("Guardar");
 
@@ -454,6 +466,19 @@ public class MainSwing {
         severityComboBox.setSelectedItem(alertaConfig.getSeveridad());
         shapeComboBox.setSelectedItem(alertaConfig.getForma());
         selectedColorButton.setBackground(alertaConfig.getColor());
+
+        // Lógica de verificación para configurar la figura basada en las
+        // configuraciones de las alertas
+
+        // private variableParaGuardarFigura;
+        if ("Círculo".equals(alertaConfig.getForma())) {
+            figurasAlert.setColor(alertaConfig.getColor());
+            System.out.println("La forma es un Círculo.");
+        } else if (alertaConfig.getForma() == "Triángulo") {
+            System.out.println("La forma es un Triángulo.");
+        } else if (alertaConfig.getForma() == "Cuadrado") {
+            System.out.println("La forma es un Cuadrado.");
+        }
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);

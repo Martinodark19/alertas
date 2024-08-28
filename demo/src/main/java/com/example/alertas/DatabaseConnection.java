@@ -1,59 +1,66 @@
 package com.example.alertas;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DatabaseConnection {
-
-    // Cambiar al nombre de tu base de datos
+public class DatabaseConnection 
+{
     private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=alertas_db;integratedSecurity=true;encrypt=false;";
 
-    // Método para obtener el último registro de la tabla alertas
-    public static Object[] fetchLastAlert() {
-        Object[] lastAlert = null;
-        String query = "SELECT TOP 1 * FROM dbo.alertas ORDER BY alertaId DESC"; // Selecciona el último registro por
-                                                                                 // alertaId en orden descendente
+    public static List<Object[]> fetchAlertsAfterId(int lastId) 
+    {
+        List<Object[]> alertList = new ArrayList<>();
+        String query = "SELECT * FROM dbo.alertas WHERE alertaId > ? ORDER BY alertaId ASC"; 
+
         try (Connection connection = DriverManager.getConnection(DB_URL);
-                PreparedStatement statement = connection.prepareStatement(query);
-                ResultSet resultSet = statement.executeQuery()) {
+             PreparedStatement statement = connection.prepareStatement(query)) 
+        {
+            statement.setInt(1, lastId);
+            ResultSet resultSet = statement.executeQuery();
 
-            if (resultSet.next()) {
-                lastAlert = new Object[30]; // Ajustar tamaño según el número de columnas de la tabla alertas
+            while (resultSet.next()) 
+            {
+                Object[] alert = new Object[30]; // Ajustar tamaño según el número de columnas de la tabla alertas
 
-                lastAlert[0] = resultSet.getInt("alertaid");
-                lastAlert[1] = resultSet.getString("codalerta");
-                lastAlert[2] = resultSet.getString("nombre");
-                lastAlert[3] = resultSet.getInt("sentenciaId");
-                lastAlert[4] = resultSet.getTimestamp("inicioevento");
-                lastAlert[5] = resultSet.getTimestamp("identificacionalerta");
-                lastAlert[6] = resultSet.getString("nombreActivo");
-                lastAlert[7] = resultSet.getString("proceso");
-                lastAlert[8] = resultSet.getBigDecimal("latencia");
-                lastAlert[9] = resultSet.getString("tipoServicio");
-                lastAlert[10] = resultSet.getString("CI");
-                lastAlert[11] = resultSet.getString("Subtiposervicio");
-                lastAlert[12] = resultSet.getBigDecimal("jitter");
-                lastAlert[13] = resultSet.getBigDecimal("disponibilidad");
-                lastAlert[14] = resultSet.getBigDecimal("packetlost");
-                lastAlert[15] = resultSet.getBigDecimal("rssi");
-                lastAlert[16] = resultSet.getBigDecimal("nsr");
-                lastAlert[17] = resultSet.getBigDecimal("PLM");
-                lastAlert[18] = resultSet.getString("tipoExWa");
-                lastAlert[19] = resultSet.getString("codigoEvento");
-                lastAlert[20] = resultSet.getString("descripcionevento");
-                lastAlert[21] = resultSet.getString("Origen");
-                lastAlert[22] = resultSet.getString("tipodocumento");
-                lastAlert[23] = resultSet.getString("estado");
-                lastAlert[24] = resultSet.getString("resumen");
-                lastAlert[25] = resultSet.getString("titulo");
-                lastAlert[26] = resultSet.getString("numero");
-                lastAlert[27] = resultSet.getTimestamp("fechaestado");
-                lastAlert[28] = resultSet.getString("razonestado");
+                alert[0] = resultSet.getInt("alertaid");
+                alert[1] = resultSet.getString("codalerta");
+                alert[2] = resultSet.getString("nombre");
+                alert[3] = resultSet.getInt("sentenciaId");
+                alert[4] = resultSet.getTimestamp("inicioevento");
+                alert[5] = resultSet.getTimestamp("identificacionalerta");
+                alert[6] = resultSet.getString("nombreActivo");
+                alert[7] = resultSet.getString("proceso");
+                alert[8] = resultSet.getBigDecimal("latencia");
+                alert[9] = resultSet.getString("tipoServicio");
+                alert[10] = resultSet.getString("CI");
+                alert[11] = resultSet.getString("Subtiposervicio");
+                alert[12] = resultSet.getBigDecimal("jitter");
+                alert[13] = resultSet.getBigDecimal("disponibilidad");
+                alert[14] = resultSet.getBigDecimal("packetlost");
+                alert[15] = resultSet.getBigDecimal("rssi");
+                alert[16] = resultSet.getBigDecimal("nsr");
+                alert[17] = resultSet.getBigDecimal("PLM");
+                alert[18] = resultSet.getString("tipoExWa");
+                alert[19] = resultSet.getString("codigoEvento");
+                alert[20] = resultSet.getString("descripcionevento");
+                alert[21] = resultSet.getString("Origen");
+                alert[22] = resultSet.getString("tipodocumento");
+                alert[23] = resultSet.getString("estado");
+                alert[24] = resultSet.getString("resumen");
+                alert[25] = resultSet.getString("titulo");
+                alert[26] = resultSet.getString("numero");
+                alert[27] = resultSet.getTimestamp("fechaestado");
+                alert[28] = resultSet.getString("razonestado");
+
+                alertList.add(alert);
             }
-
-        } catch (SQLException e) {
+        } 
+        catch (SQLException e) 
+        {
             e.printStackTrace();
         }
 
-        return lastAlert;
+        return alertList; // Devolver la lista de las nuevas alertas ordenadas por alertaId ascendente
     }
 }
