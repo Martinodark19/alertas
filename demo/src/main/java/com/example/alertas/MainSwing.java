@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
-import com.example.FigurasAlert;
+import com.example.FigurasDivididas;
 import com.example.header.AlertasConfig;
 import com.example.header.Configuracion;
 
@@ -30,7 +30,15 @@ public class MainSwing {
     Configuracion configuracion = new Configuracion();
 
     // instancia de las figuras
-    FigurasAlert figurasAlert = new FigurasAlert();
+    FigurasDivididas figurasDivididas = new FigurasDivididas();
+
+    // Crear paneles para cada figura usando las subclases de FigurasDivididas
+    // FigurasDivididas.CirculoPanel circuloPanel = new
+    // FigurasDivididas.CirculoPanel(alertaConfig.getColor());
+    // FigurasDivididas.CuadradoPanel cuadradoPanel = new
+    // FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
+    // FigurasDivididas.TrianguloPanel trianguloPanel = new
+    // FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
 
     // instancia para guardar
 
@@ -41,6 +49,9 @@ public class MainSwing {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainSwing::new);
     }
+
+    // Método para configurar y dibujar la figura según la configuración de la
+    // alerta
 
     public MainSwing() {
         JFrame frame = new JFrame("Mi App");
@@ -84,13 +95,34 @@ public class MainSwing {
             JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
             sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Reducimos la fuente
 
-            JLabel alertLabel = new JLabel("Alert " + (char) (64 + i), SwingConstants.CENTER);
-            alertLabel.setFont(new Font("Arial", Font.PLAIN, 10)); // Reducimos la fuente
-
+            // Panel para la figura
             JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
             labelsPanel.setOpaque(false); // Mantener el fondo de la sección
             labelsPanel.add(sectionLabel);
-            labelsPanel.add(alertLabel);
+
+            // Agregar la figura correspondiente en las secciones 1, 3, 5, 7
+            if (i % 2 != 0) {
+                JPanel figuraPanel;
+                switch (i) {
+                    case 1:
+                        figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
+                        break;
+                    case 3:
+                        figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
+                        break;
+                    case 5:
+                        figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
+                        break;
+                    case 7:
+                        figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor()); // Puedes cambiar la
+                                                                                                  // figura si es
+                                                                                                  // necesario
+                        break;
+                    default:
+                        figuraPanel = new JPanel(); // En caso de error
+                }
+                labelsPanel.add(figuraPanel); // Añade la figura al panel
+            }
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -149,7 +181,6 @@ public class MainSwing {
             sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
 
             sectionsPanel.add(sectionPanel);
-
         }
 
         // Añadir secciones al GridBagLayout
@@ -469,16 +500,6 @@ public class MainSwing {
 
         // Lógica de verificación para configurar la figura basada en las
         // configuraciones de las alertas
-
-        // private variableParaGuardarFigura;
-        if ("Círculo".equals(alertaConfig.getForma())) {
-            figurasAlert.setColor(alertaConfig.getColor());
-            System.out.println("La forma es un Círculo.");
-        } else if (alertaConfig.getForma() == "Triángulo") {
-            System.out.println("La forma es un Triángulo.");
-        } else if (alertaConfig.getForma() == "Cuadrado") {
-            System.out.println("La forma es un Cuadrado.");
-        }
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);
