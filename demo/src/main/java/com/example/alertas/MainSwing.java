@@ -12,7 +12,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class MainSwing {
     private JPanel selectedSection;
@@ -20,6 +22,8 @@ public class MainSwing {
     private JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
+    private Boolean showAlertsToSection = false;
+    private Integer auxiliarVariable;
 
     private DatabaseConnection databaseConnection;
 
@@ -86,102 +90,125 @@ public class MainSwing {
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        for (int i = 1; i <= 8; i++) {
-            JPanel sectionPanel = new JPanel(new BorderLayout());
-            sectionPanel.setBackground(Color.decode("#cccccc"));
-            sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
+        Timer sectionUpdateTimer = new Timer(2000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sectionsPanel.removeAll(); // Limpia las secciones anteriores para agregar las nuevas
+                for (int i = 1; i <= 8; i++) {
+                    JPanel sectionPanel = new JPanel(new BorderLayout());
+                    sectionPanel.setBackground(Color.decode("#cccccc"));
+                    sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
 
-            // Contenido de la sección
-            JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
-            sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Reducimos la fuente
+                    // Contenido de la sección
+                    JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
+                    sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Reducimos la fuente
 
-            // Panel para la figura
-            JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
-            labelsPanel.setOpaque(false); // Mantener el fondo de la sección
-            labelsPanel.add(sectionLabel);
+                    // Panel para la figura
+                    JPanel labelsPanel = new JPanel(new GridLayout(2, 1));
+                    labelsPanel.setOpaque(false); // Mantener el fondo de la sección
+                    labelsPanel.add(sectionLabel);
 
-            // Agregar la figura correspondiente en las secciones 1, 3, 5, 7
-            if (i % 2 != 0) {
-                JPanel figuraPanel;
-                switch (i) {
-                    case 1:
-                        figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
-                        break;
-                    case 3:
-                        figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
-                        break;
-                    case 5:
-                        figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
-                        break;
-                    case 7:
-                        figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor()); // Puedes cambiar la
-                                                                                                  // figura si es
-                                                                                                  // necesario
-                        break;
-                    default:
-                        figuraPanel = new JPanel(); // En caso de error
+                    // Agregar la figura correspondiente en las secciones 1, 3, 5, 7
+                    if (showAlertsToSection) {
+                        // Lista de secciones disponibles para mostrar las alertas
+                        List<Integer> seccionesDisponibles = Arrays.asList(1, 3, 5, 7);
+
+                        // Verificar si la sección actual está en la lista de secciones disponibles
+                        if (seccionesDisponibles.contains(i)) {
+                            // Seleccionar la figura basada en el índice de la sección y la configuración de
+                            // la alerta
+                            JPanel figuraPanel;
+                            switch (alertaConfig.getForma()) {
+                                case "Círculo":
+                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
+                                    break;
+                                case "Cuadrado":
+                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
+                                    break;
+                                case "Triángulo":
+                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
+                                    break;
+                                default:
+                                    figuraPanel = new JPanel(); // En caso de error o forma no reconocida
+                                    break;
+                            }
+                            labelsPanel.add(figuraPanel); // Añade la figura al panel
+                            labelsPanel.setVisible(true);
+                        }
+                    }
+
+                    // Botón de Cambiar Color
+                    JButton changeColorButton = new JButton("Cambiar Color");
+                    changeColorButton.setBackground(Color.decode("#009dad"));
+                    changeColorButton.setForeground(Color.WHITE);
+                    changeColorButton.setFont(new Font("Arial", Font.PLAIN, 8));
+                    changeColorButton.setMargin(new Insets(0, 0, 0, 0));
+                    changeColorButton.setBorderPainted(false);
+                    changeColorButton.setFocusPainted(false);
+                    changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
+
+                    changeColorButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            selectedSection = sectionPanel;
+                            showColorPickerModal(frame);
+                        }
+                    });
+
+                    // Botón de Cambiar Título
+                    JButton changeTitleButton = new JButton("Cambiar Título");
+                    changeTitleButton.setBackground(Color.decode("#f39c12"));
+                    changeTitleButton.setForeground(Color.WHITE);
+                    changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 8));
+                    changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
+                    changeTitleButton.setBorderPainted(false);
+                    changeTitleButton.setFocusPainted(false);
+                    changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
+
+                    changeTitleButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            selectedSectionLabel = sectionLabel;
+                            showTitleChangeModal(frame);
+                        }
+                    });
+
+                    // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
+                    // otro
+                    JPanel buttonPanel = new JPanel();
+                    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
+                    buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
+
+                    // Alinear los botones a la derecha dentro del panel vertical
+                    buttonPanel.add(changeColorButton);
+                    buttonPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Espacio entre los botones
+                    buttonPanel.add(changeTitleButton);
+
+                    // Crear un panel envolvente que colocará los botones alineados a la derecha
+                    JPanel wrapperPanel = new JPanel(new BorderLayout());
+                    wrapperPanel.setOpaque(false); // Mantener el fondo del panel transparente
+                    wrapperPanel.add(buttonPanel, BorderLayout.EAST); // Colocar los botones a la derecha
+
+                    // Añadir el contenido central y el wrapperPanel en la sección
+                    sectionPanel.add(labelsPanel, BorderLayout.CENTER);
+                    sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior
+                                                                        // derecha
+
+                    sectionsPanel.add(sectionPanel);
                 }
-                labelsPanel.add(figuraPanel); // Añade la figura al panel
+
+                // Actualizar el panel para mostrar la nueva configuración
+                sectionsPanel.revalidate();
+                sectionsPanel.repaint();
             }
+        });
 
-            // Botón de Cambiar Color
-            JButton changeColorButton = new JButton("Cambiar Color");
-            changeColorButton.setBackground(Color.decode("#009dad"));
-            changeColorButton.setForeground(Color.WHITE);
-            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 8));
-            changeColorButton.setMargin(new Insets(0, 0, 0, 0));
-            changeColorButton.setBorderPainted(false);
-            changeColorButton.setFocusPainted(false);
-            changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
+        // Iniciar el Timer
+        sectionUpdateTimer.start();
 
-            changeColorButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    selectedSection = sectionPanel;
-                    showColorPickerModal(frame);
-                }
-            });
-
-            // Botón de Cambiar Título
-            JButton changeTitleButton = new JButton("Cambiar Título");
-            changeTitleButton.setBackground(Color.decode("#f39c12"));
-            changeTitleButton.setForeground(Color.WHITE);
-            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 8));
-            changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
-            changeTitleButton.setBorderPainted(false);
-            changeTitleButton.setFocusPainted(false);
-            changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
-
-            changeTitleButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    selectedSectionLabel = sectionLabel;
-                    showTitleChangeModal(frame);
-                }
-            });
-
-            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
-            // otro
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
-            buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
-
-            // Alinear los botones a la derecha dentro del panel vertical
-            buttonPanel.add(changeColorButton);
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Espacio entre los botones
-            buttonPanel.add(changeTitleButton);
-
-            // Crear un panel envolvente que colocará los botones alineados a la derecha
-            JPanel wrapperPanel = new JPanel(new BorderLayout());
-            wrapperPanel.setOpaque(false); // Mantener el fondo del panel transparente
-            wrapperPanel.add(buttonPanel, BorderLayout.EAST); // Colocar los botones a la derecha
-
-            // Añadir el contenido central y el wrapperPanel en la sección
-            sectionPanel.add(labelsPanel, BorderLayout.CENTER);
-            sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
-
-            sectionsPanel.add(sectionPanel);
-        }
+        // Actualizar el panel para mostrar la nueva configuración
+        sectionsPanel.revalidate();
+        sectionsPanel.repaint();
 
         // Añadir secciones al GridBagLayout
         gbc.gridx = 0;
@@ -245,19 +272,44 @@ public class MainSwing {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
                 if (!newAlerts.isEmpty()) {
+                    showAlertsToSection = true;
                     for (Object[] alert : newAlerts) {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
 
-                        // logica para cambiar el color de la alerta segun su configuracion
-                        // figurasAlert.get
-                        // alertaConfig.getColor()
+                        // Lógica para mostrar la figura en una sección aleatoria
+                        if (showAlertsToSection) {
+                            Random random = new Random();
+                            int randomSectionIndex = random.nextInt(4) * 2 + 1; // Aleatorio entre 1, 3, 5, 7
+                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(randomSectionIndex - 1);
 
+                            // Seleccionar la figura basada en la configuración de la alerta
+                            JPanel figuraPanel;
+                            switch (alertaConfig.getForma()) {
+                                case "Círculo":
+                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
+                                    break;
+                                case "Cuadrado":
+                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
+                                    break;
+                                case "Triángulo":
+                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
+                                    break;
+                                default:
+                                    figuraPanel = new JPanel(); // En caso de error o forma no reconocida
+                                    break;
+                            }
+
+                            sectionPanel.add(figuraPanel, BorderLayout.CENTER);
+                            sectionPanel.revalidate();
+                            sectionPanel.repaint();
+                        }
                     }
 
-                    // Actualizar el último alertaId procesado
+                    // Actualizar el último alertId procesado
                     lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
 
                     alertTableModel.fireTableDataChanged();
+                    showAlertsToSection = false;
                 }
             }
         });
@@ -316,7 +368,6 @@ public class MainSwing {
         nextEventTable.getColumnModel().getColumn(0).setPreferredWidth(50); // #
         nextEventTable.getColumnModel().getColumn(1).setPreferredWidth(100); // First
         nextEventTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Last
-        nextEventTable.getColumnModel().getColumn(3).setPreferredWidth(100); // Handle
 
         JPanel nextEventTablePanel = new JPanel(new BorderLayout());
         nextEventTablePanel.add(new JLabel("Eventos Siguientes", JLabel.CENTER), BorderLayout.NORTH);
@@ -374,20 +425,11 @@ public class MainSwing {
         JFormattedTextField msField = new JFormattedTextField(numberFormat);
         msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
 
-        // Ajustar el tamaño visible del campo de entrada
-        // msField.setColumns(4); // Ajustar para que solo se puedan ver 4 dígitos como
-        // máximo
-
-        // Establecer el tamaño preferido para hacerlo más pequeño
-        // msField.setPreferredSize(new Dimension(50, 20)); // Ancho 50 píxeles, Alto 20
-        // píxeles
-
         JButton applyButton = new JButton("Guardar");
 
         applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 // obtener milisegundos limpio
                 Number value = (Number) msField.getValue();
 
@@ -399,20 +441,14 @@ public class MainSwing {
 
                     // Mostrar un mensaje de éxito
                     JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-
                 } else {
-                    configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacio
+                    configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacío
 
                     JOptionPane.showMessageDialog(owner,
                             "El campo no puede quedar vacío. Por favor, reintente con un número válido.");
-
                 }
-
             }
         });
-
-        // obtener los getters para guardar configuraciones en memoria
-        // configuracion.getUpdateFrequency();
 
         // Añadir los componentes al panel de configuración
         configPanel.add(msLabel);
@@ -464,7 +500,6 @@ public class MainSwing {
         });
 
         // Botón para guardar
-
         JButton saveButton = new JButton("Guardar");
 
         saveButton.addActionListener(new ActionListener() {
@@ -480,26 +515,17 @@ public class MainSwing {
                 alertaConfig.setForma(forma); // Establecer la forma
                 alertaConfig.setColor(color); // Establecer el color
 
-                // alertConfigMap.put(tipoAlerta, alertaConfig);
-
                 alertDialog.dispose(); // Cierra el diálogo después de guardar
 
                 // Mostrar un mensaje de éxito
                 JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-                // alertConfigMap.put(tipoAlerta, saveInstanceAlerts); // Almacenar en memoria
-
             }
         });
-
-        // String tipoAlertaSeleccionada = (String) alertTypeComboBox.getSelectedItem();
 
         alertTypeComboBox.setSelectedItem(alertaConfig.getTipoAlerta());
         severityComboBox.setSelectedItem(alertaConfig.getSeveridad());
         shapeComboBox.setSelectedItem(alertaConfig.getForma());
         selectedColorButton.setBackground(alertaConfig.getColor());
-
-        // Lógica de verificación para configurar la figura basada en las
-        // configuraciones de las alertas
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);

@@ -10,18 +10,18 @@ public class FigurasDivididas {
         private Color color;
 
         public CirculoPanel(Color color) {
-            this.color = color; // Establecer el color recibido como parámetro
-            this.setOpaque(false); // Hacer el fondo transparente
-            this.setPreferredSize(new Dimension(30, 30)); // Establecer el tamaño preferido al tamaño de la figura
+            this.color = color;
+            this.setOpaque(false);
+            this.setPreferredSize(new Dimension(10, 10)); // Establecer el tamaño reducido
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(color); // Usar el color recibido
-            int diameter = Math.min(getWidth(), getHeight()); // Asegura que el círculo se ajuste al panel
-            g2d.fillOval(0, 0, diameter, diameter); // Dibuja el círculo desde la posición (0,0)
+            g2d.setColor(color);
+            int diameter = 8; // Reducir el diámetro a la mitad
+            g2d.fillOval(0, 0, diameter, diameter); // Dibuja el círculo en 8x8 píxeles
         }
     }
 
@@ -30,18 +30,18 @@ public class FigurasDivididas {
         private Color color;
 
         public CuadradoPanel(Color color) {
-            this.color = color; // Establecer el color recibido como parámetro
-            this.setOpaque(false); // Hacer el fondo transparente
-            this.setPreferredSize(new Dimension(30, 30)); // Establecer el tamaño preferido al tamaño de la figura
+            this.color = color;
+            this.setOpaque(false);
+            this.setPreferredSize(new Dimension(8, 8)); // Establecer el tamaño reducido
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(color); // Usar el color recibido
-            int size = Math.min(getWidth(), getHeight()); // Asegura que el cuadrado se ajuste al panel
-            g2d.fillRect(0, 0, size, size); // Dibuja el cuadrado desde la posición (0,0)
+            g2d.setColor(color);
+            int size = 8; // Reducir el tamaño a la mitad
+            g2d.fillRect(0, 0, size, size); // Dibuja el cuadrado en 8x8 píxeles
         }
     }
 
@@ -50,19 +50,19 @@ public class FigurasDivididas {
         private Color color;
 
         public TrianguloPanel(Color color) {
-            this.color = color; // Establecer el color recibido como parámetro
-            this.setOpaque(false); // Hacer el fondo transparente
-            this.setPreferredSize(new Dimension(15, 15)); // Establecer el tamaño preferido ligeramente mayor
+            this.color = color;
+            this.setOpaque(false);
+            this.setPreferredSize(new Dimension(8, 8)); // Establecer el tamaño reducido
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setColor(color); // Usar el color recibido
-            int[] xPoints = {0, 7, 15}; // Ajustar las coordenadas para el tamaño mayor
-            int[] yPoints = {15, 0, 15};
-            g2d.fillPolygon(xPoints, yPoints, 3); // Dibuja el triángulo ocupando todo el panel
+            g2d.setColor(color);
+            int[] xPoints = {0, 4, 8}; // Coordenadas para el triángulo de 8x8 píxeles
+            int[] yPoints = {8, 0, 8};
+            g2d.fillPolygon(xPoints, yPoints, 3); // Dibuja el triángulo en el espacio de 8x8 píxeles
         }
     }
 }
