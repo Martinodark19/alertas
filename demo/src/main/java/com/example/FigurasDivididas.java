@@ -3,10 +3,12 @@ package com.example;
 import javax.swing.*;
 import java.awt.*;
 
-public class FigurasDivididas {
+public class FigurasDivididas 
+{
 
     // Panel para dibujar un círculo
-    public static class CirculoPanel extends JPanel {
+    public static class CirculoPanel extends JPanel 
+    {
         private Color color;
 
         public CirculoPanel(Color color) {
