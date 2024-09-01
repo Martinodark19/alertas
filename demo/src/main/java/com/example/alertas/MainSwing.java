@@ -15,8 +15,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainSwing 
-{
+public class MainSwing {
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
     private JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
@@ -25,9 +24,6 @@ public class MainSwing
     private Boolean showAlertsToSection = false;
     private Integer auxiliarVariable;
     JPanel labelsPanel;
-
-
-    
 
     private DatabaseConnection databaseConnection;
 
@@ -58,10 +54,10 @@ public class MainSwing
         SwingUtilities.invokeLater(MainSwing::new);
     }
 
-    // Método para configurar y dibujar la figura según la configuración de la alerta
+    // Método para configurar y dibujar la figura según la configuración de la
+    // alerta
 
-    public MainSwing() 
-    {
+    public MainSwing() {
         JFrame frame = new JFrame("Mi App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
@@ -94,25 +90,24 @@ public class MainSwing
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        /* 
-        Timer timerForSections = new Timer(2000, new ActionListener() 
-        {
-            @Override
-            public void actionPerformed(ActionEvent e) 
-            {
-                // Acción que se ejecuta cada 2 segundos
-                System.out.println("Timer ejecutado: " + System.currentTimeMillis());
-            }
-        });
-        
+        /*
+         * Timer timerForSections = new Timer(2000, new ActionListener()
+         * {
+         * 
+         * @Override
+         * public void actionPerformed(ActionEvent e)
+         * {
+         * // Acción que se ejecuta cada 2 segundos
+         * System.out.println("Timer ejecutado: " + System.currentTimeMillis());
+         * }
+         * });
+         * 
+         * 
+         * // Iniciar el temporizador
+         * timerForSections.start();
+         */
 
-        // Iniciar el temporizador
-        timerForSections.start();
-        */
-
-
-        for (int i = 1; i <= 8; i++) 
-        {
+        for (int i = 1; i <= 8; i++) {
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode("#cccccc"));
             sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
@@ -126,8 +121,6 @@ public class MainSwing
             labelsPanel.setOpaque(false); // Mantener el fondo de la sección
             labelsPanel.add(sectionLabel);
 
-
-
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
             changeColorButton.setBackground(Color.decode("#009dad"));
@@ -138,8 +131,7 @@ public class MainSwing
             changeColorButton.setFocusPainted(false);
             changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
 
-            changeColorButton.addActionListener(new ActionListener() 
-            {
+            changeColorButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     selectedSection = sectionPanel;
@@ -157,8 +149,7 @@ public class MainSwing
             changeTitleButton.setFocusPainted(false);
             changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
 
-            changeTitleButton.addActionListener(new ActionListener() 
-            {
+            changeTitleButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     selectedSectionLabel = sectionLabel;
@@ -166,7 +157,8 @@ public class MainSwing
                 }
             });
 
-            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del otro
+            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
+            // otro
             JPanel buttonPanel = new JPanel();
             buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
             buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
@@ -188,14 +180,13 @@ public class MainSwing
             sectionsPanel.add(sectionPanel);
 
             // Actualizar el panel para mostrar la nueva configuración
-            //sectionsPanel.revalidate();
-           // sectionsPanel.repaint();
+            // sectionsPanel.revalidate();
+            // sectionsPanel.repaint();
         }
 
-
         // Actualizar el panel para mostrar la nueva configuración
-       sectionsPanel.revalidate();
-       sectionsPanel.repaint();
+        sectionsPanel.revalidate();
+        sectionsPanel.repaint();
 
         // Añadir secciones al GridBagLayout
         gbc.gridx = 0;
@@ -209,37 +200,36 @@ public class MainSwing
         JPanel tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 
         // Tabla de alertas con scroll horizontal
-        String[] alertColumns = 
-        {
-            "Alerta ID", // alertaid
-            "Código Alerta", // codalerta
-            "Nombre", // nombre
-            "Sentencia ID", // sentenciaId
-            "Inicio del Evento", // inicioevento
-            "Identificación Alerta", // identificacionalerta
-            "Nombre Activo", // nombreActivo
-            "Proceso", // proceso
-            "Latencia", // latencia
-            "Tipo de Servicio", // tipoServicio
-            "CI", // CI
-            "Subtipo Servicio", // Subtiposervicio
-            "Jitter", // jitter
-            "Disponibilidad", // disponibilidad
-            "Packet Lost", // packetlost
-            "RSSI", // rssi
-            "NSR", // nsr
-            "PLM", // PLM
-            "Tipo ExWa", // tipoExWa
-            "Código Evento", // codigoEvento
-            "Descripción Evento", // descripcionevento
-            "Origen", // Origen
-            "Tipo Documento", // tipodocumento
-            "Estado", // estado
-            "Resumen", // resumen
-            "Título", // titulo
-            "Número", // numero
-            "Fecha Estado", // fechaestado
-            "Razón Estado" // razonestado
+        String[] alertColumns = {
+                "Alerta ID", // alertaid
+                "Código Alerta", // codalerta
+                "Nombre", // nombre
+                "Sentencia ID", // sentenciaId
+                "Inicio del Evento", // inicioevento
+                "Identificación Alerta", // identificacionalerta
+                "Nombre Activo", // nombreActivo
+                "Proceso", // proceso
+                "Latencia", // latencia
+                "Tipo de Servicio", // tipoServicio
+                "CI", // CI
+                "Subtipo Servicio", // Subtiposervicio
+                "Jitter", // jitter
+                "Disponibilidad", // disponibilidad
+                "Packet Lost", // packetlost
+                "RSSI", // rssi
+                "NSR", // nsr
+                "PLM", // PLM
+                "Tipo ExWa", // tipoExWa
+                "Código Evento", // codigoEvento
+                "Descripción Evento", // descripcionevento
+                "Origen", // Origen
+                "Tipo Documento", // tipodocumento
+                "Estado", // estado
+                "Resumen", // resumen
+                "Título", // titulo
+                "Número", // numero
+                "Fecha Estado", // fechaestado
+                "Razón Estado" // razonestado
         };
 
         alertTableModel = new DefaultTableModel(alertColumns, 0);
@@ -251,75 +241,72 @@ public class MainSwing
         // Llenar la tabla con los valores iniciales
         alertTableModel.addRow(lastAlert);
 
-// Crear una instancia del Timer
-Timer timer = new Timer(2000, new ActionListener() 
-{
-    private int lastProcessedId = 0;
+        // Crear una instancia del Timer
+        Timer timer = new Timer(2000, new ActionListener() {
+            private int lastProcessedId = 0;
 
-    @Override
-    public void actionPerformed(ActionEvent e) 
-    {
-        List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
-        if (!newAlerts.isEmpty()) 
-        {
-            for (Object[] alert : newAlerts) 
-            {
-                alertTableModel.insertRow(0, alert); // Inserta en la primera posición
+                if (!newAlerts.isEmpty()) {
+                    for (Object[] alert : newAlerts) {
+                        alertTableModel.insertRow(0, alert); // Inserta en la primera posición
 
-                // Lógica para mostrar la figura en la sección correspondiente
-                showAlertsToSection = true;
+                        // Lógica para mostrar la figura en la sección correspondiente
+                        showAlertsToSection = true;
 
-                if (showAlertsToSection) 
-                {
-                    // Secciones disponibles
-                    int[] seccionesDisponibles = {1, 3, 5, 7};
-                    // Selección aleatoria de una sección disponible
-                    int randomIndex = (int) (Math.random() * seccionesDisponibles.length);
-                    int sectionIndex = seccionesDisponibles[randomIndex];
+                        if (showAlertsToSection) {
+                            // Secciones disponibles
+                            int[] seccionesDisponibles = { 1, 3, 5, 7 };
+                            // Selección aleatoria de una sección disponible
+                            int randomIndex = (int) (Math.random() * seccionesDisponibles.length);
+                            int sectionIndex = seccionesDisponibles[randomIndex];
 
-                    // Ahora `sectionIndex` será 1, 3, 5, o 7
-                    JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1); // -1 porque los índices empiezan en 0
-                    
-                    // Obtén el `labelsPanel` de esa sección para añadir la figura
-                    JPanel labelsPanel = (JPanel) sectionPanel.getComponent(0); // Obtén el primer componente, que debería ser labelsPanel
+                            // Ahora `sectionIndex` será 1, 3, 5, o 7
+                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1); // -1 porque
+                                                                                                         // los índices
+                                                                                                         // empiezan en
+                                                                                                         // 0
 
-                    // Seleccionar la figura basada en la configuración de la alerta
-                    JPanel figuraPanel;
-                    switch (alertaConfig.getForma()) 
-                    {
-                        case "Círculo":
-                            figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
-                            break;
-                        case "Cuadrado":
-                            figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
-                            break;
-                        case "Triángulo":
-                            figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
-                            break;
-                        default:
-                            figuraPanel = new JPanel(); // En caso de error o forma no reconocida
-                            break;
+                            // Obtén el `labelsPanel` de esa sección para añadir la figura
+                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(0); // Obtén el primer componente,
+                                                                                        // que debería ser labelsPanel
+
+                            // Seleccionar la figura basada en la configuración de la alerta
+                            JPanel figuraPanel;
+                            switch (alertaConfig.getForma()) {
+                                case "Círculo":
+                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
+                                    break;
+                                case "Cuadrado":
+                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
+                                    break;
+                                case "Triángulo":
+                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
+                                    break;
+                                default:
+                                    figuraPanel = new JPanel(); // En caso de error o forma no reconocida
+                                    break;
+                            }
+
+                            // Añadir la figura al `labelsPanel` en la sección específica
+                            labelsPanel.add(figuraPanel);
+                            sectionPanel.revalidate();
+                            sectionPanel.repaint();
+                        }
                     }
 
-                    // Añadir la figura al `labelsPanel` en la sección específica
-                    labelsPanel.add(figuraPanel);
-                    sectionPanel.revalidate();
-                    sectionPanel.repaint();
+                    // Actualizar el último alertId procesado
+                    lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
+
+                    alertTableModel.fireTableDataChanged();
                 }
             }
+        });
 
-            // Actualizar el último alertId procesado
-            lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
-
-            alertTableModel.fireTableDataChanged();
-        }
-    }
-});
-
-// Iniciar el temporizador
-timer.start();
-
+        // Iniciar el temporizador
+        timer.start();
 
         // Habilitar el scroll horizontal
         alertScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -337,11 +324,11 @@ timer.start();
 
         // Tabla de eventos anteriores con scroll horizontal
         String[] eventColumns = {
-            "#", "First", "Last", "Handle", "Evento", "Descripción", "Fecha", "Estado"
+                "#", "First", "Last", "Handle", "Evento", "Descripción", "Fecha", "Estado"
         };
         Object[][] eventData = {
-            { 1, "Mark", "Otto", "@mdo", "Evento X", "Descripción Evento X", "2024-08-23", "Activo" },
-            { 2, "Jacob", "Thornton", "@fat", "Evento Y", "Descripción Evento Y", "2024-08-22", "Inactivo" }
+                { 1, "Mark", "Otto", "@mdo", "Evento X", "Descripción Evento X", "2024-08-23", "Activo" },
+                { 2, "Jacob", "Thornton", "@fat", "Evento Y", "Descripción Evento Y", "2024-08-22", "Inactivo" }
         };
         JTable previousEventTable = new JTable(new DefaultTableModel(eventData, eventColumns));
         JScrollPane previousEventScrollPane = new JScrollPane(previousEventTable);
@@ -404,8 +391,7 @@ timer.start();
         });
 
         // Evento para abrir el diálogo de configuración
-        configureWindowButton.addActionListener(new ActionListener() 
-        {
+        configureWindowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showConfigDialog(frame);
