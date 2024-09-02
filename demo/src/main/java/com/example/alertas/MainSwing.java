@@ -22,7 +22,6 @@ public class MainSwing {
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
     private Boolean showAlertsToSection = false;
-    private Integer auxiliarVariable;
     JPanel figuresPanel; // Empezamos con las figuras a la derecha
     JPanel figuresPanelLeft;
 
@@ -39,15 +38,6 @@ public class MainSwing {
     // instancia de las figuras
     FigurasDivididas figurasDivididas = new FigurasDivididas();
 
-    // Crear paneles para cada figura usando las subclases de FigurasDivididas
-    // FigurasDivididas.CirculoPanel circuloPanel = new
-    // FigurasDivididas.CirculoPanel(alertaConfig.getColor());
-    // FigurasDivididas.CuadradoPanel cuadradoPanel = new
-    // FigurasDivididas.CuadradoPanel(alertaConfig.getColor());
-    // FigurasDivididas.TrianguloPanel trianguloPanel = new
-    // FigurasDivididas.TrianguloPanel(alertaConfig.getColor());
-
-    // instancia para guardar
 
     public MainSwing(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -92,23 +82,6 @@ public class MainSwing {
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-
-        /*
-         * Timer timerForSections = new Timer(2000, new ActionListener()
-         * {
-         * 
-         * @Override
-         * public void actionPerformed(ActionEvent e)
-         * {
-         * // Acción que se ejecuta cada 2 segundos
-         * System.out.println("Timer ejecutado: " + System.currentTimeMillis());
-         * }
-         * });
-         * 
-         * 
-         * // Iniciar el temporizador
-         * timerForSections.start();
-         */
 
         for (int i = 1; i <= 8; i++) 
         {
@@ -285,14 +258,10 @@ public class MainSwing {
                             int sectionIndex = seccionesDisponibles[randomIndex];
 
                             // Ahora `sectionIndex` será 1, 3, 5, o 7
-                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1); // -1 porque
-                                                                                                         // los índices
-                                                                                                         // empiezan en
-                                                                                                         // 0
+                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1); 
 
                             // Obtén el `labelsPanel` de esa sección para añadir la figura
-                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer componente,
-                                                                                        // que debería ser labelsPanel
+                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer componente que debería ser labelsPanel
 
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
@@ -326,17 +295,13 @@ public class MainSwing {
                                     labelsPanelLeft.add(figuraPanel);
                                     labelsPanelLeft.revalidate();
                                     labelsPanelLeft.repaint();
-                                    // Acción que se ejecuta después de 1 segundo
-                                    System.out.println("Acción ejecutada después de 1 segundo");
+
                                 }
                             });
 
-                            //labelsPanel.removeAll();
                             timerPanelLeft.start();
 
-                            //labelsPanelLeft.add(figuraPanel);
-                            //labelsPanelLeft.revalidate();
-                            //labelsPanelLeft.repaint();
+
                             
                         }
                     }
