@@ -133,6 +133,7 @@ public class MainSwing {
             // Panel dedicado a las figuras, separado del contenido principal
             figuresPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Empezamos con las figuras a la derecha
             figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
+            figuresPanelLeft.add(figuresPanel);
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -190,7 +191,10 @@ public class MainSwing {
             sectionPanel.add(labelsPanel, BorderLayout.CENTER);
             sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
             sectionPanel.add(figuresPanel,BorderLayout.EAST);
-            
+            sectionPanel.add(figuresPanelLeft,BorderLayout.WEST);
+
+
+
 
             sectionsPanel.add(sectionPanel);
 
@@ -313,8 +317,26 @@ public class MainSwing {
                             labelsPanel.revalidate();
                             labelsPanel.repaint();
 
+                            JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer componente,
 
+                            Timer timerPanelLeft = new Timer(1500, new ActionListener() { // 1000 milisegundos = 1 segundo
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    labelsPanel.removeAll();
+                                    labelsPanelLeft.add(figuraPanel);
+                                    labelsPanelLeft.revalidate();
+                                    labelsPanelLeft.repaint();
+                                    // Acción que se ejecuta después de 1 segundo
+                                    System.out.println("Acción ejecutada después de 1 segundo");
+                                }
+                            });
 
+                            //labelsPanel.removeAll();
+                            timerPanelLeft.start();
+
+                            //labelsPanelLeft.add(figuraPanel);
+                            //labelsPanelLeft.revalidate();
+                            //labelsPanelLeft.repaint();
                             
                         }
                     }
