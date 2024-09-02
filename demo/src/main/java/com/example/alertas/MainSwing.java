@@ -23,6 +23,9 @@ public class MainSwing {
     private DefaultTableModel alertTableModel; // Modelo de la tabla
     private Boolean showAlertsToSection = false;
     private Integer auxiliarVariable;
+    JPanel figuresPanel; // Empezamos con las figuras a la derecha
+    JPanel figuresPanelLeft;
+
     JPanel labelsPanel;
 
     private DatabaseConnection databaseConnection;
@@ -107,7 +110,8 @@ public class MainSwing {
          * timerForSections.start();
          */
 
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 8; i++) 
+        {
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode("#cccccc"));
             sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
@@ -120,6 +124,15 @@ public class MainSwing {
             labelsPanel = new JPanel(new GridLayout(2, 1));
             labelsPanel.setOpaque(false); // Mantener el fondo de la sección
             labelsPanel.add(sectionLabel);
+
+            // Panel dedicado a las figuras, separado del contenido principal
+            figuresPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // Empezamos con las figuras a la derecha
+            figuresPanel.setOpaque(false); // Para mantener el fondo del panel principal
+
+            
+            // Panel dedicado a las figuras, separado del contenido principal
+            figuresPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Empezamos con las figuras a la derecha
+            figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -176,6 +189,8 @@ public class MainSwing {
             // Añadir el contenido central y el wrapperPanel en la sección
             sectionPanel.add(labelsPanel, BorderLayout.CENTER);
             sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
+            sectionPanel.add(figuresPanel,BorderLayout.EAST);
+            
 
             sectionsPanel.add(sectionPanel);
 
@@ -250,13 +265,15 @@ public class MainSwing {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
                 if (!newAlerts.isEmpty()) {
-                    for (Object[] alert : newAlerts) {
+                    for (Object[] alert : newAlerts) 
+                    {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
 
                         // Lógica para mostrar la figura en la sección correspondiente
                         showAlertsToSection = true;
 
-                        if (showAlertsToSection) {
+                        if (showAlertsToSection) 
+                        {
                             // Secciones disponibles
                             int[] seccionesDisponibles = { 1, 3, 5, 7 };
                             // Selección aleatoria de una sección disponible
@@ -270,12 +287,13 @@ public class MainSwing {
                                                                                                          // 0
 
                             // Obtén el `labelsPanel` de esa sección para añadir la figura
-                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(0); // Obtén el primer componente,
+                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer componente,
                                                                                         // que debería ser labelsPanel
 
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) {
+                            switch (alertaConfig.getForma()) 
+                            {
                                 case "Círculo":
                                     figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
                                     break;
@@ -292,11 +310,15 @@ public class MainSwing {
 
                             // Añadir la figura al `labelsPanel` en la sección específica
                             labelsPanel.add(figuraPanel);
-                            sectionPanel.revalidate();
-                            sectionPanel.repaint();
+                            labelsPanel.revalidate();
+                            labelsPanel.repaint();
+
+
+
+                            
                         }
                     }
-
+                                
                     // Actualizar el último alertId procesado
                     lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
 
