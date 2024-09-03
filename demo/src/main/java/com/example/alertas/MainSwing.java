@@ -85,8 +85,7 @@ public class MainSwing {
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        for (int i = 1; i <= 8; i++) 
-        {
+        for (int i = 1; i <= 8; i++) {
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode("#cccccc"));
             sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
@@ -103,11 +102,25 @@ public class MainSwing {
             // Panel dedicado a las figuras, separado del contenido principal
             figuresPanel = new JPanel(); // Empezamos con las figuras a la derecha
             figuresPanel.setOpaque(false); // Para mantener el fondo del panel principal
+            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.Y_AXIS));
+            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.X_AXIS)); // Alinear las figuras horizontalmente
+            figuresPanel.setMinimumSize(new Dimension(36, 36)); // Tamaño mínimo de las figuras
+            figuresPanel.setMaximumSize(new Dimension(36, 36)); // Tamaño máximo de las figuras
+
 
             // Panel dedicado a las figuras, separado del contenido principal
             figuresPanelLeft = new JPanel(); // Empezamos con las figuras a la derecha
             figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
             figuresPanelLeft.add(figuresPanel);
+            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.Y_AXIS));
+            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS)); // Alinear las figuras horizontalmente
+            figuresPanelLeft.setMinimumSize(new Dimension(36, 36)); // Tamaño mínimo de las figuras
+            figuresPanelLeft.setMaximumSize(new Dimension(36, 36)); // Tamaño máximo de las figuras
+
+        
+
+
+
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -229,26 +242,21 @@ public class MainSwing {
         alertTableModel.addRow(lastAlert);
 
         // Crear una instancia del Timer
-        Timer timer = new Timer(2000, new ActionListener() 
-        {
+        Timer timer = new Timer(2000, new ActionListener() {
             private int lastProcessedId = 0;
 
             @Override
-            public void actionPerformed(ActionEvent e) 
-            {
+            public void actionPerformed(ActionEvent e) {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
-                if (!newAlerts.isEmpty()) 
-                {
-                    for (Object[] alert : newAlerts) 
-                    {
+                if (!newAlerts.isEmpty()) {
+                    for (Object[] alert : newAlerts) {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
 
                         // Lógica para mostrar la figura en la sección correspondiente
                         showAlertsToSection = true;
 
-                        if (showAlertsToSection) 
-                        {
+                        if (showAlertsToSection) {
                             // Secciones disponibles
                             int[] seccionesDisponibles = { 1, 3, 5, 7 };
                             // Selección aleatoria de una sección disponible
@@ -260,8 +268,8 @@ public class MainSwing {
 
                             // Obtén el `labelsPanel` de esa sección para añadir la figura
                             JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
-                                                                                             // componente que debería
-                                                                                             // ser labelsPanel
+                                                                                        // componente que debería
+                                                                                        // ser labelsPanel
 
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
@@ -295,7 +303,7 @@ public class MainSwing {
                                 labelsPanel.removeAll();
                                 labelsPanelLeft.add(figuraPanel);
                                 labelsPanelLeft.revalidate();
-                                labelsPanelLeft.repaint(); 
+                                labelsPanelLeft.repaint();
                             }, 2, TimeUnit.SECONDS);
                             executor.shutdown();
                         }
@@ -371,7 +379,7 @@ public class MainSwing {
         // Añadir tablas al panel principal
         tablesPanel.add(alertTablePanel);
         tablesPanel.add(previousEventTablePanel);
-        tablesPanel.add(nextEventTablePanel);  
+        tablesPanel.add(nextEventTablePanel);
 
         // Añadir tablas al GridBagLayout
         gbc.gridx = 0;
@@ -422,8 +430,7 @@ public class MainSwing {
 
         JButton applyButton = new JButton("Guardar");
 
-        applyButton.addActionListener(new ActionListener() 
-        {
+        applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // obtener milisegundos limpio
