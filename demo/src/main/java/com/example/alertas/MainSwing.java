@@ -14,6 +14,9 @@ import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainSwing {
     private JPanel selectedSection;
@@ -37,7 +40,6 @@ public class MainSwing {
 
     // instancia de las figuras
     FigurasDivididas figurasDivididas = new FigurasDivididas();
-
 
     public MainSwing(DatabaseConnection databaseConnection) {
         this.databaseConnection = databaseConnection;
@@ -99,12 +101,11 @@ public class MainSwing {
             labelsPanel.add(sectionLabel);
 
             // Panel dedicado a las figuras, separado del contenido principal
-            figuresPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // Empezamos con las figuras a la derecha
+            figuresPanel = new JPanel(); // Empezamos con las figuras a la derecha
             figuresPanel.setOpaque(false); // Para mantener el fondo del panel principal
 
-            
             // Panel dedicado a las figuras, separado del contenido principal
-            figuresPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEFT)); // Empezamos con las figuras a la derecha
+            figuresPanelLeft = new JPanel(); // Empezamos con las figuras a la derecha
             figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
             figuresPanelLeft.add(figuresPanel);
 
@@ -163,17 +164,11 @@ public class MainSwing {
             // Añadir el contenido central y el wrapperPanel en la sección
             sectionPanel.add(labelsPanel, BorderLayout.CENTER);
             sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
-            sectionPanel.add(figuresPanel,BorderLayout.EAST);
-            sectionPanel.add(figuresPanelLeft,BorderLayout.WEST);
-
-
-
+            sectionPanel.add(figuresPanel, BorderLayout.EAST);
+            sectionPanel.add(figuresPanelLeft, BorderLayout.WEST);
 
             sectionsPanel.add(sectionPanel);
 
-            // Actualizar el panel para mostrar la nueva configuración
-            // sectionsPanel.revalidate();
-            // sectionsPanel.repaint();
         }
 
         // Actualizar el panel para mostrar la nueva configuración
@@ -234,14 +229,17 @@ public class MainSwing {
         alertTableModel.addRow(lastAlert);
 
         // Crear una instancia del Timer
-        Timer timer = new Timer(2000, new ActionListener() {
+        Timer timer = new Timer(2000, new ActionListener() 
+        {
             private int lastProcessedId = 0;
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) 
+            {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
-                if (!newAlerts.isEmpty()) {
+                if (!newAlerts.isEmpty()) 
+                {
                     for (Object[] alert : newAlerts) 
                     {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
@@ -258,15 +256,16 @@ public class MainSwing {
                             int sectionIndex = seccionesDisponibles[randomIndex];
 
                             // Ahora `sectionIndex` será 1, 3, 5, o 7
-                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1); 
+                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1);
 
                             // Obtén el `labelsPanel` de esa sección para añadir la figura
-                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer componente que debería ser labelsPanel
+                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
+                                                                                             // componente que debería
+                                                                                             // ser labelsPanel
 
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) 
-                            {
+                            switch (alertaConfig.getForma()) {
                                 case "Círculo":
                                     figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
                                     break;
@@ -286,26 +285,22 @@ public class MainSwing {
                             labelsPanel.revalidate();
                             labelsPanel.repaint();
 
-                            JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer componente,
+                            JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer
+                                                                                            // componente,
 
-                            Timer timerPanelLeft = new Timer(1500, new ActionListener() { // 1000 milisegundos = 1 segundo
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    labelsPanel.removeAll();
-                                    labelsPanelLeft.add(figuraPanel);
-                                    labelsPanelLeft.revalidate();
-                                    labelsPanelLeft.repaint();
-
-                                }
-                            });
-
-                            timerPanelLeft.start();
-
-
-                            
+                            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                            executor.schedule(() -> {
+                                // Código a ejecutar después del delay
+                                System.out.println("Delay completado");
+                                labelsPanel.removeAll();
+                                labelsPanelLeft.add(figuraPanel);
+                                labelsPanelLeft.revalidate();
+                                labelsPanelLeft.repaint(); 
+                            }, 2, TimeUnit.SECONDS);
+                            executor.shutdown();
                         }
                     }
-                                
+
                     // Actualizar el último alertId procesado
                     lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
 
@@ -376,7 +371,7 @@ public class MainSwing {
         // Añadir tablas al panel principal
         tablesPanel.add(alertTablePanel);
         tablesPanel.add(previousEventTablePanel);
-        tablesPanel.add(nextEventTablePanel);
+        tablesPanel.add(nextEventTablePanel);  
 
         // Añadir tablas al GridBagLayout
         gbc.gridx = 0;
@@ -427,7 +422,8 @@ public class MainSwing {
 
         JButton applyButton = new JButton("Guardar");
 
-        applyButton.addActionListener(new ActionListener() {
+        applyButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // obtener milisegundos limpio
