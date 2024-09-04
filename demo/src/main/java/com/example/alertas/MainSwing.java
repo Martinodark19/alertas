@@ -21,6 +21,7 @@ public class MainSwing {
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
     private JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
+    private JButton selectedColorButtonForAlertConfigColor; // Para actualizar el color del botón en el diálogo de Configurar Alerta
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
     private Boolean showAlertsToSection = false;
@@ -119,11 +120,7 @@ public class MainSwing {
             figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS)); // Alinear las figuras horizontalmente
             figuresPanelLeft.setMinimumSize(new Dimension(39, 39)); // Tamaño mínimo de las figuras
             figuresPanelLeft.setMaximumSize(new Dimension(39, 39)); // Tamaño máximo de las figuras
-
-        
-
-
-
+            
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -403,7 +400,8 @@ public class MainSwing {
         frame.setVisible(true);
 
         // Evento para abrir el diálogo de configuración de alerta
-        configureAlertButton.addActionListener(new ActionListener() {
+        configureAlertButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showAlertConfigDialog(frame);
@@ -504,13 +502,26 @@ public class MainSwing {
 
         // Color
         JLabel colorLabel = new JLabel("Color:");
-        selectedColorButton = new JButton("Seleccionar Color");
-        selectedColorButton.setBackground(Color.LIGHT_GRAY);
+        selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
+        selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
 
-        selectedColorButton.addActionListener(new ActionListener() {
+        selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() 
+        {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                showColorPickerModal(owner);
+            public void actionPerformed(ActionEvent e) 
+            {
+                // Llama al modal del selector de color para las alertas
+                Color selectedColor = showColorPickerModalForAlerts(owner);
+        
+                // Si se selecciona un color (no se cierra el modal sin elegir)
+                if (selectedColor != null) 
+                {
+                    // Cambiar el color de fondo del botón al color seleccionado
+                    selectedColorButtonForAlertConfigColor.setBackground(selectedColor);
+        
+                    // Opcional: si quieres guardar este color en alguna variable de configuración
+                    alertaConfig.setColor(selectedColor);
+                }
             }
         });
 
@@ -523,7 +534,7 @@ public class MainSwing {
                 String tipoAlerta = (String) alertTypeComboBox.getSelectedItem();
                 String severidad = (String) severityComboBox.getSelectedItem();
                 String forma = (String) shapeComboBox.getSelectedItem();
-                Color color = selectedColorButton.getBackground();
+                Color color = selectedColorButtonForAlertConfigColor.getBackground();
 
                 alertaConfig.setTipoAlerta(tipoAlerta); // Establecer el tipo de alerta
                 alertaConfig.setSeveridad(severidad); // Establecer la severidad
@@ -540,7 +551,7 @@ public class MainSwing {
         alertTypeComboBox.setSelectedItem(alertaConfig.getTipoAlerta());
         severityComboBox.setSelectedItem(alertaConfig.getSeveridad());
         shapeComboBox.setSelectedItem(alertaConfig.getForma());
-        selectedColorButton.setBackground(alertaConfig.getColor());
+        selectedColorButtonForAlertConfigColor.setBackground(alertaConfig.getColor());
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);
@@ -550,7 +561,7 @@ public class MainSwing {
         configPanel.add(shapeLabel);
         configPanel.add(shapeComboBox);
         configPanel.add(colorLabel);
-        configPanel.add(selectedColorButton);
+        configPanel.add(selectedColorButtonForAlertConfigColor);
 
         alertDialog.add(configPanel, BorderLayout.CENTER);
         alertDialog.add(saveButton, BorderLayout.SOUTH);
@@ -560,7 +571,8 @@ public class MainSwing {
     }
 
     // Método para mostrar el modal del selector de color
-    private void showColorPickerModal(JFrame owner) {
+    private void showColorPickerModal(JFrame owner) 
+    {
         JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
         colorDialog.setSize(600, 400);
         colorDialog.setLayout(new BorderLayout());
@@ -571,7 +583,8 @@ public class MainSwing {
         String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
                 "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
 
-        for (String color : colors) {
+        for (String color : colors) 
+        {
             JButton colorButton = createColorButton(color);
             colorButtonsPanel.add(colorButton);
         }
@@ -588,6 +601,54 @@ public class MainSwing {
         colorDialog.setLocationRelativeTo(owner);
         colorDialog.setVisible(true);
     }
+
+
+    private Color showColorPickerModalForAlerts(JFrame owner) 
+{
+    JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
+    colorDialog.setSize(600, 400);
+    colorDialog.setLayout(new BorderLayout());
+
+    JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
+    colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+    String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
+                        "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
+    
+    final Color[] selectedColor = {null};  // Array para almacenar el color seleccionado
+
+    for (String color : colors) {
+        JButton colorButton = new JButton();
+        colorButton.setBackground(Color.decode(color));
+        colorButton.setPreferredSize(new Dimension(50, 50));
+
+        // Evento al hacer clic en un color
+        colorButton.addActionListener(e -> {
+            selectedColor[0] = Color.decode(color); // Almacenar el color seleccionado
+            colorDialog.dispose();  // Cerrar el modal una vez seleccionado
+        });
+
+        colorButtonsPanel.add(colorButton);
+    }
+
+    // Botón de cerrar sin seleccionar un color
+    JButton closeButton = new JButton("Cerrar");
+    closeButton.addActionListener(e -> colorDialog.dispose());
+
+    JPanel bottomPanel = new JPanel();
+    bottomPanel.add(closeButton);
+
+    colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
+    colorDialog.add(bottomPanel, BorderLayout.SOUTH);
+
+    colorDialog.setLocationRelativeTo(owner);
+    colorDialog.setVisible(true);
+
+    return selectedColor[0];  // Devolver el color seleccionado
+}
+
+
+
 
     // Método para mostrar el modal de cambio de título
     private void showTitleChangeModal(JFrame owner) {
@@ -631,4 +692,25 @@ public class MainSwing {
         });
         return button;
     }
+
+
+    private JButton createColorButtonForAlertColors(String color) 
+    {
+        JButton button = new JButton();
+        button.setBackground(Color.decode(color));
+        button.setPreferredSize(new Dimension(50, 50));
+        button.addActionListener(e -> {
+            if (selectedSection != null) 
+            {
+                selectedSection.setBackground(Color.decode(color));
+            } 
+            else if (selectedColorButtonForAlertConfigColor != null) 
+            {
+                selectedColorButtonForAlertConfigColor.setBackground(Color.decode(color));
+            }
+        });
+        return button;
+    }
+
+    
 }
