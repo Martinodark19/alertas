@@ -55,7 +55,8 @@ public class MainSwing {
     // Método para configurar y dibujar la figura según la configuración de la
     // alerta
 
-    public MainSwing() {
+    public MainSwing() 
+    {
         JFrame frame = new JFrame("Mi App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
@@ -647,9 +648,6 @@ public class MainSwing {
     return selectedColor[0];  // Devolver el color seleccionado
 }
 
-
-
-
     // Método para mostrar el modal de cambio de título
     private void showTitleChangeModal(JFrame owner) {
         JDialog titleDialog = new JDialog(owner, "Cambiar Título", true);
@@ -679,22 +677,7 @@ public class MainSwing {
         titleDialog.setVisible(true);
     }
 
-    private JButton createColorButton(String color) {
-        JButton button = new JButton();
-        button.setBackground(Color.decode(color));
-        button.setPreferredSize(new Dimension(50, 50));
-        button.addActionListener(e -> {
-            if (selectedSection != null) {
-                selectedSection.setBackground(Color.decode(color));
-            } else if (selectedColorButton != null) {
-                selectedColorButton.setBackground(Color.decode(color));
-            }
-        });
-        return button;
-    }
-
-
-    private JButton createColorButtonForAlertColors(String color) 
+    private JButton createColorButton(String color) 
     {
         JButton button = new JButton();
         button.setBackground(Color.decode(color));
@@ -704,13 +687,12 @@ public class MainSwing {
             {
                 selectedSection.setBackground(Color.decode(color));
             } 
-            else if (selectedColorButtonForAlertConfigColor != null) 
+            else if (selectedColorButton != null) 
             {
-                selectedColorButtonForAlertConfigColor.setBackground(Color.decode(color));
+                selectedColorButton.setBackground(Color.decode(color));
             }
         });
         return button;
     }
-
     
 }

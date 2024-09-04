@@ -5,7 +5,8 @@ import java.awt.*;
 
 public class FigurasDivididas {
 
-    public static class CirculoPanel extends JPanel {
+    public static class CirculoPanel extends JPanel 
+    {
         private Color color;
         private int borderWidth = 2; // Grosor del borde
 
@@ -55,7 +56,8 @@ public class FigurasDivididas {
         }
     }
 
-    public static class TrianguloPanel extends JPanel {
+    public static class TrianguloPanel extends JPanel 
+    {
         private Color color;
         private int borderWidth = 1; // Grosor del borde
 
