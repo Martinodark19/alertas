@@ -28,7 +28,16 @@ public class MainSwing {
     // inicializacion de paneles
     private JPanel figuresPanel; 
     private JPanel figuresPanelLeft;
-    private JPanel labelsPanel;    
+    private JPanel labelsPanel;
+    
+    //timer para la actualizacion de la tabla basada en los MS
+    private Timer timer;
+
+    // variable encargada de la logica para tomar decision en el timmer
+    private Boolean verifySaveMs = false;
+
+    //variable contendra los ms para timming
+    private Integer timeForTimmerUpdated;
 
     private DatabaseConnection databaseConnection;
 
@@ -44,11 +53,14 @@ public class MainSwing {
     // instancia de las figuras
     FigurasDivididas figurasDivididas = new FigurasDivididas();
 
-    public MainSwing(DatabaseConnection databaseConnection) {
+
+    public MainSwing(DatabaseConnection databaseConnection) 
+    {
         this.databaseConnection = databaseConnection;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         SwingUtilities.invokeLater(MainSwing::new);
     }
 
@@ -202,7 +214,8 @@ public class MainSwing {
         JPanel tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 
         // Tabla de alertas con scroll horizontal
-        String[] alertColumns = {
+        String[] alertColumns = 
+        {
                 "Alerta ID", // alertaid
                 "Código Alerta", // codalerta
                 "Nombre", // nombre
@@ -238,12 +251,45 @@ public class MainSwing {
         JTable alertTable = new JTable(alertTableModel);
         JScrollPane alertScrollPane = new JScrollPane(alertTable);
 
-        // aqui ira la llamada a la base de datos para la tabla alertas
 
         // Llenar la tabla con los valores iniciales
         alertTableModel.addRow(lastAlert);
+        
+        timeForTimmerUpdated = configuracion.getUpdateFrequency();
 
-        Timer timer = new Timer(updateFrequency, new ActionListener() 
+
+        // Crear un nuevo Timer con la nueva frecuencia
+        Timer timerForUpdateConfigMs = new Timer(1000, new ActionListener() 
+        {
+            @Override
+            public void actionPerformed(ActionEvent e) 
+            {
+                timer.start();
+
+                if(verifySaveMs == true)
+                {
+                    timeForTimmerUpdated = updateFrequency;
+
+                    if(timer.isRunning() == true)
+                    {
+                        timer.stop();                                            
+                        timer.setDelay(timeForTimmerUpdated);
+                        timer.start();
+                    }
+
+                }   
+
+                verifySaveMs = false;
+
+            }
+        });
+
+        // Iniciar el Timer
+        timerForUpdateConfigMs.start();
+
+        
+        // timer para ejecutar las consultas esporadicas a la base de datos
+         timer = new Timer(timeForTimmerUpdated, new ActionListener() 
         {
             private int lastProcessedId = 0;
 
@@ -261,6 +307,7 @@ public class MainSwing {
                         // Lógica para mostrar la figura en la sección correspondiente
                         showAlertsToSection = true;
 
+    
                         if (showAlertsToSection) 
                         {
                             // Secciones disponibles
@@ -323,8 +370,6 @@ public class MainSwing {
             }
         });
 
-        // Iniciar el temporizador
-        timer.start();
 
         // Habilitar el scroll horizontal
         alertScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -410,7 +455,8 @@ public class MainSwing {
         });
 
         // Evento para abrir el diálogo de configuración
-        configureWindowButton.addActionListener(new ActionListener() {
+        configureWindowButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showConfigDialog(frame);
@@ -452,6 +498,7 @@ public class MainSwing {
 
 
                     // Mostrar un mensaje de éxito
+                    verifySaveMs = true;
                     JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
                 } 
                 else 
@@ -463,6 +510,7 @@ public class MainSwing {
                 }
             }
         });
+
 
         // Añadir los componentes al panel de configuración
         configPanel.add(msLabel);
@@ -477,7 +525,8 @@ public class MainSwing {
     }
 
     // Método para mostrar el diálogo de configuración de alerta
-    private void showAlertConfigDialog(JFrame owner) {
+    private void showAlertConfigDialog(JFrame owner) 
+    {
         JDialog alertDialog = new JDialog(owner, "Configurar Alerta", true);
         alertDialog.setSize(400, 300);
         alertDialog.setLayout(new BorderLayout());
@@ -618,7 +667,8 @@ public class MainSwing {
     
     final Color[] selectedColor = {null};  // Array para almacenar el color seleccionado
 
-    for (String color : colors) {
+    for (String color : colors) 
+    {
         JButton colorButton = new JButton();
         colorButton.setBackground(Color.decode(color));
         colorButton.setPreferredSize(new Dimension(50, 50));
@@ -649,7 +699,8 @@ public class MainSwing {
 }
 
     // Método para mostrar el modal de cambio de título
-    private void showTitleChangeModal(JFrame owner) {
+    private void showTitleChangeModal(JFrame owner) 
+    {
         JDialog titleDialog = new JDialog(owner, "Cambiar Título", true);
         titleDialog.setSize(400, 200);
         titleDialog.setLayout(new BorderLayout());
