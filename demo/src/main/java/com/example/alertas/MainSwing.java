@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,10 +24,10 @@ public class MainSwing {
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
     private Boolean showAlertsToSection = false;
-    JPanel figuresPanel; // Empezamos con las figuras a la derecha
-    JPanel figuresPanelLeft;
-
-    JPanel labelsPanel;
+    // inicializacion de paneles
+    private JPanel figuresPanel; 
+    private JPanel figuresPanelLeft;
+    private JPanel labelsPanel;    
 
     private DatabaseConnection databaseConnection;
 
@@ -37,6 +36,9 @@ public class MainSwing {
 
     // instancia para almacenar configuracion del header
     Configuracion configuracion = new Configuracion();
+
+    //variable que contendra la frecuencia en ms
+    int updateFrequency = configuracion.getUpdateFrequency();
 
     // instancia de las figuras
     FigurasDivididas figurasDivididas = new FigurasDivididas();
@@ -85,7 +87,8 @@ public class MainSwing {
         JPanel sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= 8; i++) 
+        {
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode("#cccccc"));
             sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
@@ -114,8 +117,8 @@ public class MainSwing {
             figuresPanelLeft.add(figuresPanel);
             figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.Y_AXIS));
             figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS)); // Alinear las figuras horizontalmente
-            figuresPanelLeft.setMinimumSize(new Dimension(36, 36)); // Tamaño mínimo de las figuras
-            figuresPanelLeft.setMaximumSize(new Dimension(36, 36)); // Tamaño máximo de las figuras
+            figuresPanelLeft.setMinimumSize(new Dimension(39, 39)); // Tamaño mínimo de las figuras
+            figuresPanelLeft.setMaximumSize(new Dimension(39, 39)); // Tamaño máximo de las figuras
 
         
 
@@ -132,7 +135,8 @@ public class MainSwing {
             changeColorButton.setFocusPainted(false);
             changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
 
-            changeColorButton.addActionListener(new ActionListener() {
+            changeColorButton.addActionListener(new ActionListener() 
+            {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     selectedSection = sectionPanel;
@@ -241,22 +245,26 @@ public class MainSwing {
         // Llenar la tabla con los valores iniciales
         alertTableModel.addRow(lastAlert);
 
-        // Crear una instancia del Timer
-        Timer timer = new Timer(2000, new ActionListener() {
+        Timer timer = new Timer(updateFrequency, new ActionListener() 
+        {
             private int lastProcessedId = 0;
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) 
+            {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
-                if (!newAlerts.isEmpty()) {
-                    for (Object[] alert : newAlerts) {
+                if (!newAlerts.isEmpty()) 
+                {
+                    for (Object[] alert : newAlerts) 
+                    {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
 
                         // Lógica para mostrar la figura en la sección correspondiente
                         showAlertsToSection = true;
 
-                        if (showAlertsToSection) {
+                        if (showAlertsToSection) 
+                        {
                             // Secciones disponibles
                             int[] seccionesDisponibles = { 1, 3, 5, 7 };
                             // Selección aleatoria de una sección disponible
@@ -273,7 +281,8 @@ public class MainSwing {
 
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) {
+                            switch (alertaConfig.getForma()) 
+                            {
                                 case "Círculo":
                                     figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor());
                                     break;
@@ -299,7 +308,6 @@ public class MainSwing {
                             ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
                             executor.schedule(() -> {
                                 // Código a ejecutar después del delay
-                                System.out.println("Delay completado");
                                 labelsPanel.removeAll();
                                 labelsPanelLeft.add(figuraPanel);
                                 labelsPanelLeft.revalidate();
@@ -412,7 +420,8 @@ public class MainSwing {
     }
 
     // Método para mostrar el diálogo de configuración de milisegundos
-    private void showConfigDialog(JFrame owner) {
+    private void showConfigDialog(JFrame owner) 
+    {
         JDialog configDialog = new JDialog(owner, "Configuración", true);
         configDialog.setSize(300, 200);
         configDialog.setLayout(new BorderLayout());
@@ -427,24 +436,27 @@ public class MainSwing {
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         JFormattedTextField msField = new JFormattedTextField(numberFormat);
         msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
-
         JButton applyButton = new JButton("Guardar");
+        System.out.println(configuracion.getUpdateFrequency());
 
-        applyButton.addActionListener(new ActionListener() {
+        applyButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // obtener milisegundos limpio
                 Number value = (Number) msField.getValue();
 
                 if (value != null) {
-                    int updateFrequency = value.intValue();
-
+                    updateFrequency = value.intValue();
                     configuracion.setUpdateFrequency(updateFrequency);
                     configDialog.dispose(); // Cierra el diálogo después de guardar
 
+
                     // Mostrar un mensaje de éxito
                     JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-                } else {
+                } 
+                else 
+                {
                     configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacío
 
                     JOptionPane.showMessageDialog(owner,

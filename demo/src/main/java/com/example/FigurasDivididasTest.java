@@ -5,7 +5,8 @@ import java.awt.*;
 
 public class FigurasDivididasTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         // Crear una nueva ventana (JFrame)
         JFrame frame = new JFrame("Visualización de Figuras");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
