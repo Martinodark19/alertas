@@ -30,10 +30,6 @@ public class MainSwing
     // pop-up
     private Object[] lastAlertForPopup;
 
-    // checkbox del boton de Activado y desactivdo de pop-up
-    JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar"); // Inicializa marcado
-    //checkbox del boton de Activado y desactivdo de visualizar tablas
-    JCheckBox hideTableCheckBox = new JCheckBox("Mostrar/Ocultar");
 
     Object[] alert; // Inicializa la variable `alert` con datos válidos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
@@ -65,6 +61,11 @@ public class MainSwing
     // instancia para almacenar configuracion del header
     Configuracion configuracion = new Configuracion();
 
+    // checkbox del boton de Activado y desactivdo de pop-up
+    JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar",configuracion.isShowPopup()); // Inicializa marcado
+    //checkbox del boton de Activado y desactivdo de visualizar tablas
+    JCheckBox hideTableCheckBox = new JCheckBox("Mostrar/Ocultar",configuracion.isHideTable());
+    
     // variable que contendra la frecuencia en ms
     int updateFrequency = configuracion.getUpdateFrequency();
 
@@ -544,6 +545,7 @@ public class MainSwing
                 if (hideTableCheckBox.isSelected()) 
                 {
                     // Oculta la tabla si el JCheckBox está marcado
+                    configuracion.setHideTable(true);
                     tablesPanel.setVisible(false);
                 }
                 else
@@ -554,6 +556,8 @@ public class MainSwing
 
             }
         });
+        // logica para almacenar en memoria ocultar tabla
+        configuracion.isHideTable();
 
         // Añadir los componentes al panel
         configPanel.add(msLabel); // Etiqueta de frecuencia en milisegundos

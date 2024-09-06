@@ -7,7 +7,8 @@ public class Configuracion
     private boolean hideTable;   // Estado del checkbox para "Ocultar tabla"
 
     // Constructor por defecto con valores predeterminados
-    public Configuracion() {
+    public Configuracion() 
+    {
         this.updateFrequency = 2000; // Valor predeterminado de 2000 ms
         this.showPopup = false;      // Valor predeterminado de no mostrar pop-up
         this.hideTable = false;      // Valor predeterminado de no ocultar la tabla
@@ -44,4 +45,15 @@ public class Configuracion
         this.showPopup = showPopup;
     }
 
+    // Getter para el estado de "Ocultar tabla"
+    public boolean isHideTable() 
+    {
+        return hideTable;
+    }
+
+    // Setter para el estado de "Ocultar tabla"
+    public void setHideTable(boolean hideTable) 
+    {
+        this.hideTable = hideTable;
+    }
 }
