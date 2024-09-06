@@ -17,7 +17,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class MainSwing {
+public class MainSwing 
+{
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
     private JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
@@ -25,14 +26,22 @@ public class MainSwing {
                                                             // Configurar Alerta
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
 
-    //variable que contendra la informacion de la ultima alerta ingresada para el pop-up
+    // variable que contendra la informacion de la ultima alerta ingresada para el
+    // pop-up
     private Object[] lastAlertForPopup;
 
-    // checkbox del boton de Activado y desactivdo
-    JCheckBox popupCheckBox = new JCheckBox("Activado/Desactivado", false);  // Inicializa marcado
+    // checkbox del boton de Activado y desactivdo de pop-up
+    JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar"); // Inicializa marcado
+    //checkbox del boton de Activado y desactivdo de visualizar tablas
+    JCheckBox hideTableCheckBox = new JCheckBox("Mostrar/Ocultar");
 
     Object[] alert; // Inicializa la variable `alert` con datos válidos
     private DefaultTableModel alertTableModel; // Modelo de la tabla
+
+    //inicializacion de variable para ocultar las 3 tablas
+    JPanel tablesPanel;
+
+
     private Boolean showAlertsToSection = false;
     // inicializacion de paneles
     private JPanel figuresPanel;
@@ -74,6 +83,7 @@ public class MainSwing {
     // alerta
 
     public MainSwing() {
+        
         JFrame frame = new JFrame("Mi App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
@@ -214,10 +224,12 @@ public class MainSwing {
         contentPanel.add(sectionsPanel, gbc);
 
         // Configuración de las tablas para que ocupen más espacio en la pantalla
-        JPanel tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        
 
         // Tabla de alertas con scroll horizontal
-        String[] alertColumns = {
+        String[] alertColumns = 
+        {
                 "Alerta ID", // alertaid
                 "Código Alerta", // codalerta
                 "Nombre", // nombre
@@ -248,10 +260,14 @@ public class MainSwing {
                 "Fecha Estado", // fechaestado
                 "Razón Estado" // razonestado
         };
+    
 
         alertTableModel = new DefaultTableModel(alertColumns, 0);
         JTable alertTable = new JTable(alertTableModel);
         JScrollPane alertScrollPane = new JScrollPane(alertTable);
+        //alertScrollPane.setVisible(false);
+
+
 
         // Llenar la tabla con los valores iniciales
         alertTableModel.addRow(lastAlert);
@@ -259,7 +275,8 @@ public class MainSwing {
         timeForTimmerUpdated = configuracion.getUpdateFrequency();
 
         // Crear un nuevo Timer con la nueva frecuencia
-        Timer timerForUpdateConfigMs = new Timer(1000, new ActionListener() {
+        Timer timerForUpdateConfigMs = new Timer(1000, new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timer.start();
@@ -291,12 +308,10 @@ public class MainSwing {
             public void actionPerformed(ActionEvent e) 
             {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
-                System.out.println(timer.getDelay());
 
                 if (!newAlerts.isEmpty()) 
                 {
-                    for (Object[] alert : newAlerts) 
-                    {
+                    for (Object[] alert : newAlerts) {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
                         lastAlertForPopup = alert;
 
@@ -318,32 +333,31 @@ public class MainSwing {
                             JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
                                                                                         // componente que debería
                                                                                         // ser labelsPanel
-                            
+
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) 
-                            {
+                            switch (alertaConfig.getForma()) {
                                 case "Círculo":
-                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),new Object[][] { alert });
-                                            if(popupCheckBox.isSelected())
-                                            {
-                                                openPopupWithTable(new Object[][] { alert });
-                                            }
+                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
+                                            new Object[][] { alert });
+                                    if (popupCheckBox.isSelected()) {
+                                        openPopupWithTable(new Object[][] { alert });
+                                    }
                                     break;
                                 case "Cuadrado":
-                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),new Object[][] { alert });
-                                    if(popupCheckBox.isSelected())
-                                    {
+                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
+                                            new Object[][] { alert });
+                                    if (popupCheckBox.isSelected()) {
                                         openPopupWithTable(new Object[][] { alert });
                                     }
 
                                     break;
                                 case "Triángulo":
-                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(), new Object[][] { alert });
-                                            if(popupCheckBox.isSelected())
-                                            {
-                                                openPopupWithTable(new Object[][] { alert });
-                                            }
+                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
+                                            new Object[][] { alert });
+                                    if (popupCheckBox.isSelected()) {
+                                        openPopupWithTable(new Object[][] { alert });
+                                    }
                                     break;
                                 default:
                                     figuraPanel = new JPanel(); // En caso de error o forma no reconocida
@@ -393,10 +407,12 @@ public class MainSwing {
         alertTablePanel.add(alertScrollPane, BorderLayout.CENTER);
 
         // Tabla de eventos anteriores con scroll horizontal
-        String[] eventColumns = {
+        String[] eventColumns = 
+        {
                 "#", "First", "Last", "Handle", "Evento", "Descripción", "Fecha", "Estado"
         };
-        Object[][] eventData = {
+        Object[][] eventData = 
+        {
                 { 1, "Mark", "Otto", "@mdo", "Evento X", "Descripción Evento X", "2024-08-23", "Activo" },
                 { 2, "Jacob", "Thornton", "@fat", "Evento Y", "Descripción Evento Y", "2024-08-22", "Inactivo" }
         };
@@ -452,9 +468,9 @@ public class MainSwing {
         frame.add(mainPanel);
         frame.setVisible(true);
 
+
         // Evento para abrir el diálogo de configuración de alerta
-        configureAlertButton.addActionListener(new ActionListener() 
-        {
+        configureAlertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showAlertConfigDialog(frame);
@@ -462,8 +478,7 @@ public class MainSwing {
         });
 
         // Evento para abrir el diálogo de configuración
-        configureWindowButton.addActionListener(new ActionListener() 
-        {
+        configureWindowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showConfigDialog(frame);
@@ -471,125 +486,138 @@ public class MainSwing {
         });
     }
 
-// Método para mostrar el diálogo de configuración de milisegundos y opción de pop-up
-private void showConfigDialog(JFrame owner) 
-{
-    JDialog configDialog = new JDialog(owner, "Configuración", true);
-    configDialog.setSize(300, 250);
-    configDialog.setLayout(new BorderLayout());
-
-    // Panel para la configuración
-    JPanel configPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // 4 filas para incluir los nuevos inputs
-    configPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-    // Campo de frecuencia en milisegundos
-    JLabel msLabel = new JLabel("Frecuencia de actualización (ms):");
-    NumberFormat numberFormat = NumberFormat.getIntegerInstance();
-    JFormattedTextField msField = new JFormattedTextField(numberFormat);
-    msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
-
-    // Nueva opción para "Mostrar pop-up en pantalla"
-    JLabel popupLabel = new JLabel("Mostrar pop-up en pantalla:");
-    //popupCheckBox = new JCheckBox("Activado/Desactivado");
-    //popupCheckBox.setSelected(true);  // Marcar el JCheckBox por defecto
-
-    // Aquí vendrá la lógica para el estado de activación o desactivación del pop-up
-    // No es necesario implementar la lógica aún, solo indicamos la posibilidad.
-
-    // Botón para guardar los cambios
-    JButton applyButton = new JButton("Guardar");
-    
-    applyButton.addActionListener(new ActionListener() 
+    // Método para mostrar el diálogo de configuración de milisegundos y opción de
+    // pop-up
+    private void showConfigDialog(JFrame owner) 
     {
-        @Override
-        public void actionPerformed(ActionEvent e) 
+        JDialog configDialog = new JDialog(owner, "Configuración", true);
+        configDialog.setSize(480, 250);
+        configDialog.setLayout(new BorderLayout());
+
+        // Panel para la configuración
+        JPanel configPanel = new JPanel(new GridLayout(4, 1, 10, 10)); // 4 filas para incluir los nuevos inputs
+        configPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        // Campo de frecuencia en milisegundos
+        JLabel msLabel = new JLabel("Frecuencia de actualización (ms):");
+        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+        JFormattedTextField msField = new JFormattedTextField(numberFormat);
+        msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
+
+        // Nueva opción para "Mostrar pop-up en pantalla"
+        JLabel popupLabel = new JLabel("Mostrar pop-up en pantalla:");
+
+        // Nueva opción para "Mostrar pop-up en pantalla"
+        JLabel hideTable = new JLabel("Ocultar tabla:");
+        hideTable.setAlignmentX(Component.LEFT_ALIGNMENT);
+        hideTableCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        // Botón para guardar los cambios
+        JButton applyButton = new JButton("Guardar");
+
+        applyButton.addActionListener(new ActionListener() 
         {
-            // Obtener el valor de milisegundos limpio y aplicar su logica 
-            Number value = (Number) msField.getValue();
-
-            if (value != null) 
+            @Override
+            public void actionPerformed(ActionEvent e) 
             {
-                updateFrequency = value.intValue();
-                configuracion.setUpdateFrequency(updateFrequency);
-                configDialog.dispose(); // Cierra el diálogo después de guardar
+                // Obtener el valor de milisegundos limpio y aplicar su logica
+                Number value = (Number) msField.getValue();
 
-                // Mostrar un mensaje de éxito
-                verifySaveMs = true;
-                JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-            } 
-            else 
-            {
-                configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacío
+                if (value != null) 
+                {
+                    updateFrequency = value.intValue();
+                    configuracion.setUpdateFrequency(updateFrequency);
+                    configDialog.dispose(); // Cierra el diálogo después de guardar
 
-                JOptionPane.showMessageDialog(owner,"El campo no puede quedar vacío. Por favor, reintente con un número válido.");
+                    // Mostrar un mensaje de éxito
+                    verifySaveMs = true;
+                    JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
+                } 
+                else 
+                {
+                    configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacío
+
+                    JOptionPane.showMessageDialog(owner, "El campo no puede quedar vacío. Por favor, reintente con un número válido.");
+                }
+
+                // Lógica para ocultar tablas y mostrarlas
+                if (hideTableCheckBox.isSelected()) 
+                {
+                    // Oculta la tabla si el JCheckBox está marcado
+                    tablesPanel.setVisible(false);
+                }
+                else
+                {
+                    tablesPanel.setVisible(true);
+                } 
+
+
             }
+        });
 
-        }
-    });
+        // Añadir los componentes al panel
+        configPanel.add(msLabel); // Etiqueta de frecuencia en milisegundos
+        configPanel.add(msField); // Campo para ingresar los milisegundos
+        configPanel.add(popupLabel); // Etiqueta para mostrar pop-up
+        configPanel.add(popupCheckBox); // Input para activar/desactivar el pop-up
+        configPanel.add(hideTable);
+        configPanel.add(hideTableCheckBox);
 
-    // Añadir los componentes al panel
-    configPanel.add(msLabel);       // Etiqueta de frecuencia en milisegundos
-    configPanel.add(msField);       // Campo para ingresar los milisegundos
-    configPanel.add(popupLabel);    // Etiqueta para mostrar pop-up
-    configPanel.add(popupCheckBox); // Input para activar/desactivar el pop-up
+        // Añadir el panel de configuración al diálogo
+        configDialog.add(configPanel, BorderLayout.CENTER);
+        configDialog.add(applyButton, BorderLayout.SOUTH); // Botón en la parte inferior
 
-    // Añadir el panel de configuración al diálogo
-    configDialog.add(configPanel, BorderLayout.CENTER);
-    configDialog.add(applyButton, BorderLayout.SOUTH); // Botón en la parte inferior
+        configDialog.setLocationRelativeTo(owner); // Centrar el diálogo
+        configDialog.setVisible(true);
+    }
 
-    configDialog.setLocationRelativeTo(owner); // Centrar el diálogo
-    configDialog.setVisible(true);
-}
+    private void openPopupWithTable(Object[][] alertData) 
+    {
+        JDialog tableDialog = new JDialog((Frame) null, "Detalles de la Alerta", true); // No se pasa el owner
+        tableDialog.setSize(600, 400); // Tamaño de la ventana emergente
+        tableDialog.setLayout(new BorderLayout());
 
+        // Columnas para la tabla (deberían coincidir con los datos pasados en
+        // alertData)
+        String[] columnNames = 
+        {
+                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
+                "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio",
+                "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
+                "Código Evento", "Descripción Evento", "Origen", "Tipo Documento", "Estado",
+                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
+        };
 
-private void openPopupWithTable(Object[][] alertData) 
-{
-    JDialog tableDialog = new JDialog((Frame) null, "Detalles de la Alerta", true); // No se pasa el owner
-    tableDialog.setSize(600, 400); // Tamaño de la ventana emergente
-    tableDialog.setLayout(new BorderLayout());
+        // Crear la tabla con los datos y columnas
+        JTable table = new JTable(alertData, columnNames);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Desactiva el ajuste automático del tamaño de columnas
+        JScrollPane scrollPane = new JScrollPane(table);
 
-    // Columnas para la tabla (deberían coincidir con los datos pasados en alertData)
-    String[] columnNames = {
-        "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
-        "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio", 
-        "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
-        "Código Evento", "Descripción Evento", "Origen", "Tipo Documento", "Estado",
-        "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
-    };
+        // Configurar scroll para la tabla
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-    // Crear la tabla con los datos y columnas
-    JTable table = new JTable(alertData, columnNames);
-    table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Desactiva el ajuste automático del tamaño de columnas
-    JScrollPane scrollPane = new JScrollPane(table);
+        // Añadir la tabla con el JScrollPane al diálogo
+        tableDialog.add(scrollPane, BorderLayout.CENTER);
 
-    // Configurar scroll para la tabla
-    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // Añadir un botón para cerrar el diálogo
+        JButton closeButton = new JButton("Cerrar");
+        closeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tableDialog.dispose();
+            }
+        });
+        tableDialog.add(closeButton, BorderLayout.SOUTH);
 
-    // Añadir la tabla con el JScrollPane al diálogo
-    tableDialog.add(scrollPane, BorderLayout.CENTER);
-
-    // Añadir un botón para cerrar el diálogo
-    JButton closeButton = new JButton("Cerrar");
-    closeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            tableDialog.dispose();
-        }
-    });
-    tableDialog.add(closeButton, BorderLayout.SOUTH);
-
-    // Mostrar el diálogo
-    tableDialog.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
-    tableDialog.setVisible(true);
-}
-
-
-
-
+        // Mostrar el diálogo
+        tableDialog.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+        tableDialog.setVisible(true);
+    }
 
     // Método para mostrar el diálogo de configuración de alerta
-    private void showAlertConfigDialog(JFrame owner) {
+    private void showAlertConfigDialog(JFrame owner) 
+    {
         JDialog alertDialog = new JDialog(owner, "Configurar Alerta", true);
         alertDialog.setSize(400, 300);
         alertDialog.setLayout(new BorderLayout());
@@ -618,14 +646,16 @@ private void openPopupWithTable(Object[][] alertData)
         selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
         selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
 
-        selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() {
+        selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Llama al modal del selector de color para las alertas
                 Color selectedColor = showColorPickerModalForAlerts(owner);
 
                 // Si se selecciona un color (no se cierra el modal sin elegir)
-                if (selectedColor != null) {
+                if (selectedColor != null) 
+                {
                     // Cambiar el color de fondo del botón al color seleccionado
                     selectedColorButtonForAlertConfigColor.setBackground(selectedColor);
 
@@ -638,7 +668,8 @@ private void openPopupWithTable(Object[][] alertData)
         // Botón para guardar
         JButton saveButton = new JButton("Guardar");
 
-        saveButton.addActionListener(new ActionListener() {
+        saveButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String tipoAlerta = (String) alertTypeComboBox.getSelectedItem();
@@ -680,8 +711,10 @@ private void openPopupWithTable(Object[][] alertData)
         alertDialog.setVisible(true);
     }
 
+
     // Método para mostrar el modal del selector de color
-    private void showColorPickerModal(JFrame owner) {
+    private void showColorPickerModal(JFrame owner) 
+    {
         JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
         colorDialog.setSize(600, 400);
         colorDialog.setLayout(new BorderLayout());
@@ -692,7 +725,8 @@ private void openPopupWithTable(Object[][] alertData)
         String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
                 "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
 
-        for (String color : colors) {
+        for (String color : colors) 
+        {
             JButton colorButton = createColorButton(color);
             colorButtonsPanel.add(colorButton);
         }
@@ -724,7 +758,8 @@ private void openPopupWithTable(Object[][] alertData)
 
         final Color[] selectedColor = { null }; // Array para almacenar el color seleccionado
 
-        for (String color : colors) {
+        for (String color : colors) 
+        {
             JButton colorButton = new JButton();
             colorButton.setBackground(Color.decode(color));
             colorButton.setPreferredSize(new Dimension(50, 50));
@@ -755,7 +790,8 @@ private void openPopupWithTable(Object[][] alertData)
     }
 
     // Método para mostrar el modal de cambio de título
-    private void showTitleChangeModal(JFrame owner) {
+    private void showTitleChangeModal(JFrame owner) 
+    {
         JDialog titleDialog = new JDialog(owner, "Cambiar Título", true);
         titleDialog.setSize(400, 200);
         titleDialog.setLayout(new BorderLayout());
@@ -783,7 +819,8 @@ private void openPopupWithTable(Object[][] alertData)
         titleDialog.setVisible(true);
     }
 
-    private JButton createColorButton(String color) {
+    private JButton createColorButton(String color) 
+    {
         JButton button = new JButton();
         button.setBackground(Color.decode(color));
         button.setPreferredSize(new Dimension(50, 50));

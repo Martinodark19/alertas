@@ -10,7 +10,8 @@ import java.awt.event.ActionListener;
 public class FigurasDivididas 
 {
 
-    public static class CirculoPanel extends JPanel {
+    public static class CirculoPanel extends JPanel 
+    {
         private Color color;
         private Object[][] data;
         private int borderWidth = 2; // Grosor del borde
