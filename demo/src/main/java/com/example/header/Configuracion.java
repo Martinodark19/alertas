@@ -56,4 +56,6 @@ public class Configuracion
     {
         this.hideTable = hideTable;
     }
+
+    
 }
