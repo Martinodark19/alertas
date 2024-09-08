@@ -47,6 +47,8 @@ public class MainSwing {
     // timer para la actualizacion de la tabla basada en los MS
     private Timer timer;
 
+    private JFrame frame;
+
     // variable encargada de la logica para tomar decision en el timmer
     private Boolean verifySaveMs = false;
 
@@ -72,11 +74,13 @@ public class MainSwing {
     // instancia de las figuras
     FigurasDivididas figurasDivididas = new FigurasDivididas();
 
-    public MainSwing(DatabaseConnection databaseConnection) {
+    public MainSwing(DatabaseConnection databaseConnection) 
+    {
         this.databaseConnection = databaseConnection;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         SwingUtilities.invokeLater(MainSwing::new);
     }
 
@@ -457,7 +461,8 @@ public class MainSwing {
         frame.setVisible(true);
 
         // Evento para abrir el diálogo de configuración de alerta
-        configureAlertButton.addActionListener(new ActionListener() {
+        configureAlertButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showAlertConfigDialog(frame);
@@ -465,7 +470,8 @@ public class MainSwing {
         });
 
         // Evento para abrir el diálogo de configuración
-        configureWindowButton.addActionListener(new ActionListener() {
+        configureWindowButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showConfigDialog(frame);
@@ -475,7 +481,8 @@ public class MainSwing {
 
     // Método para mostrar el diálogo de configuración de milisegundos y opción de
     // pop-up
-    private void showConfigDialog(JFrame owner) {
+    private void showConfigDialog(JFrame owner) 
+    {
         JDialog configDialog = new JDialog(owner, "Configuración", true);
         configDialog.setSize(480, 250);
         configDialog.setLayout(new BorderLayout());
@@ -502,17 +509,22 @@ public class MainSwing {
         JLabel sectionsLabelConfiguration = new JLabel("Secciones en pantalla:");
         String[] sectionOptions = { "4 secciones", "8 secciones" };
         JComboBox<String> sectionComboBox = new JComboBox<>(sectionOptions);
+        sectionComboBox.setSelectedItem(configuracion.getSectionCount());
+
 
         // Botón para guardar los cambios
         JButton applyButton = new JButton("Guardar");
 
-        applyButton.addActionListener(new ActionListener() {
+        applyButton.addActionListener(new ActionListener() 
+        {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) 
+            {
                 // Obtener el valor de milisegundos limpio y aplicar su logica
                 Number value = (Number) msField.getValue();
 
-                if (value != null) {
+                if (value != null) 
+                {
                     updateFrequency = value.intValue();
                     configuracion.setUpdateFrequency(updateFrequency);
                     configDialog.dispose(); // Cierra el diálogo después de guardar
@@ -520,37 +532,44 @@ public class MainSwing {
                     // Mostrar un mensaje de éxito
                     verifySaveMs = true;
                     JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-                } else {
+                } 
+                else 
+                {
                     configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacío
-
-                    JOptionPane.showMessageDialog(owner,
-                            "El campo no puede quedar vacío. Por favor, reintente con un número válido.");
+                    JOptionPane.showMessageDialog(owner, "El campo no puede quedar vacío. Por favor, reintente con un número válido.");
                 }
                 // Lógica para ocultar tablas y mostrarlas
-                if (hideTableCheckBox.isSelected()) {
+                if (hideTableCheckBox.isSelected()) 
+                {
                     // Oculta la tabla si el JCheckBox está marcado
                     configuracion.setHideTable(true);
                     tablesPanel.setVisible(false);
-                } else
-
+                }
+                else 
                 {
                     tablesPanel.setVisible(true);
                 }
-                if (sectionComboBox.getSelectedItem().equals("4 secciones")) {
+                if (sectionComboBox.getSelectedItem().equals("4 secciones")) 
+                {
+                    configuracion.setSectionCount("4 secciones");
                     // Eliminar secciones específicas
                     removeSpecificSections(new int[] { 2, 4, 6, 8 });
-                } else {
-                    // sectionsPanel.removeAll(); // Elimina todos los componentes actuales del
-                    // panel
+                } 
+                else 
+                {
+                    sectionsPanel.removeAll();
                     sectionsPanel.revalidate();
                     sectionsPanel.repaint();
-                    System.out.println("8 secciones");
+                    addSpecificSections();
+                    configuracion.setSectionCount("8 secciones");
+
                 }
 
             }
         });
         // logica para almacenar en memoria ocultar tabla
         configuracion.isHideTable();
+        configuracion.getSectionCount();
 
         // Añadir los componentes al panel
         configPanel.add(msLabel); // Etiqueta de frecuencia en milisegundos
@@ -570,16 +589,21 @@ public class MainSwing {
         configDialog.setVisible(true);
     }
 
-    private void removeSpecificSections(int[] sectionsToRemove) {
-        List<Component> toRemove = new ArrayList<>();
 
+    private void removeSpecificSections(int[] sectionsToRemove) 
+    {
+        List<Component> toRemove = new ArrayList<>();
         // Recolectar los paneles a eliminar
-        for (Component comp : sectionsPanel.getComponents()) {
-            if (comp instanceof JPanel) {
+        for (Component comp : sectionsPanel.getComponents()) 
+        {
+            if (comp instanceof JPanel) 
+            {
                 JPanel panel = (JPanel) comp;
                 int sectionNumber = Integer.parseInt(panel.getName().substring(8));
-                for (int section : sectionsToRemove) {
-                    if (section == sectionNumber) {
+                for (int section : sectionsToRemove) 
+                {
+                    if (section == sectionNumber) 
+                    {
                         toRemove.add(panel);
                         break;
                     }
@@ -588,16 +612,115 @@ public class MainSwing {
         }
 
         // Eliminar los paneles recolectados
-        for (Component comp : toRemove) {
+        for (Component comp : toRemove) 
+        {
             sectionsPanel.remove(comp);
         }
-
         // Actualizar el panel después de la eliminación
         sectionsPanel.revalidate();
         sectionsPanel.repaint();
     }
 
-    private void openPopupWithTable(Object[][] alertData) {
+    private void addSpecificSections() 
+    {
+        for (int i = 1; i <= 8; i++) {
+            JPanel sectionPanel = new JPanel(new BorderLayout());
+            sectionPanel.setBackground(Color.decode("#cccccc"));
+            sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
+            sectionPanel.setName("Section-" + i);
+
+            // Contenido de la sección
+            JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
+            sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Reducimos la fuente
+
+            // Panel para la figura
+            labelsPanel = new JPanel(new GridLayout(2, 1));
+            labelsPanel.setOpaque(false); // Mantener el fondo de la sección
+            labelsPanel.add(sectionLabel);
+
+            // Panel dedicado a las figuras, separado del contenido principal
+            figuresPanel = new JPanel(); // Empezamos con las figuras a la derecha
+            figuresPanel.setOpaque(false); // Para mantener el fondo del panel principal
+            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.Y_AXIS));
+            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.X_AXIS)); // Alinear las figuras
+                                                                                   // horizontalmente
+            figuresPanel.setMinimumSize(new Dimension(36, 36)); // Tamaño mínimo de las figuras
+            figuresPanel.setMaximumSize(new Dimension(36, 36)); // Tamaño máximo de las figuras
+
+            // Panel dedicado a las figuras, separado del contenido principal
+            figuresPanelLeft = new JPanel(); // Empezamos con las figuras a la derecha
+            figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
+            figuresPanelLeft.add(figuresPanel);
+            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.Y_AXIS));
+            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS)); // Alinear las figuras
+                                                                                           // horizontalmente
+            figuresPanelLeft.setMinimumSize(new Dimension(39, 39)); // Tamaño mínimo de las figuras
+            figuresPanelLeft.setMaximumSize(new Dimension(39, 39)); // Tamaño máximo de las figuras
+
+            // Botón de Cambiar Color
+            JButton changeColorButton = new JButton("Cambiar Color");
+            changeColorButton.setBackground(Color.decode("#009dad"));
+            changeColorButton.setForeground(Color.WHITE);
+            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 8));
+            changeColorButton.setMargin(new Insets(0, 0, 0, 0));
+            changeColorButton.setBorderPainted(false);
+            changeColorButton.setFocusPainted(false);
+            changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
+
+            changeColorButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    selectedSection = sectionPanel;
+                    showColorPickerModal(frame);
+                }
+            });
+
+            // Botón de Cambiar Título
+            JButton changeTitleButton = new JButton("Cambiar Título");
+            changeTitleButton.setBackground(Color.decode("#f39c12"));
+            changeTitleButton.setForeground(Color.WHITE);
+            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 8));
+            changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
+            changeTitleButton.setBorderPainted(false);
+            changeTitleButton.setFocusPainted(false);
+            changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
+
+            changeTitleButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    selectedSectionLabel = sectionLabel;
+                    showTitleChangeModal(frame);
+                }
+            });
+
+            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
+            // otro
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
+            buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
+
+            // Alinear los botones a la derecha dentro del panel vertical
+            buttonPanel.add(changeColorButton);
+            buttonPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Espacio entre los botones
+            buttonPanel.add(changeTitleButton);
+
+            // Crear un panel envolvente que colocará los botones alineados a la derecha
+            JPanel wrapperPanel = new JPanel(new BorderLayout());
+            wrapperPanel.setOpaque(false); // Mantener el fondo del panel transparente
+            wrapperPanel.add(buttonPanel, BorderLayout.EAST); // Colocar los botones a la derecha
+
+            // Añadir el contenido central y el wrapperPanel en la sección
+            sectionPanel.add(labelsPanel, BorderLayout.CENTER);
+            sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
+            sectionPanel.add(figuresPanel, BorderLayout.EAST);
+            sectionPanel.add(figuresPanelLeft, BorderLayout.WEST);
+
+            sectionsPanel.add(sectionPanel);
+        }
+    }
+
+    private void openPopupWithTable(Object[][] alertData) 
+    {
         JDialog tableDialog = new JDialog((Frame) null, "Detalles de la Alerta", true); // No se pasa el owner
         tableDialog.setSize(600, 400); // Tamaño de la ventana emergente
         tableDialog.setLayout(new BorderLayout());
@@ -702,6 +825,7 @@ public class MainSwing {
                 alertaConfig.setForma(forma); // Establecer la forma
                 alertaConfig.setColor(color); // Establecer el color
 
+            
                 alertDialog.dispose(); // Cierra el diálogo después de guardar
 
                 // Mostrar un mensaje de éxito
@@ -726,7 +850,6 @@ public class MainSwing {
 
         alertDialog.add(configPanel, BorderLayout.CENTER);
         alertDialog.add(saveButton, BorderLayout.SOUTH);
-
         alertDialog.setLocationRelativeTo(owner);
         alertDialog.setVisible(true);
     }
@@ -743,7 +866,8 @@ public class MainSwing {
         String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
                 "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
 
-        for (String color : colors) {
+        for (String color : colors) 
+        {
             JButton colorButton = createColorButton(color);
             colorButtonsPanel.add(colorButton);
         }
@@ -774,7 +898,8 @@ public class MainSwing {
 
         final Color[] selectedColor = { null }; // Array para almacenar el color seleccionado
 
-        for (String color : colors) {
+        for (String color : colors) 
+        {
             JButton colorButton = new JButton();
             colorButton.setBackground(Color.decode(color));
             colorButton.setPreferredSize(new Dimension(50, 50));
@@ -805,7 +930,8 @@ public class MainSwing {
     }
 
     // Método para mostrar el modal de cambio de título
-    private void showTitleChangeModal(JFrame owner) {
+    private void showTitleChangeModal(JFrame owner) 
+    {
         JDialog titleDialog = new JDialog(owner, "Cambiar Título", true);
         titleDialog.setSize(400, 200);
         titleDialog.setLayout(new BorderLayout());
@@ -824,20 +950,19 @@ public class MainSwing {
             }
             titleDialog.dispose();
         });
-
         inputPanel.add(closeButton);
-
         titleDialog.add(inputPanel, BorderLayout.CENTER);
-
         titleDialog.setLocationRelativeTo(owner);
         titleDialog.setVisible(true);
     }
 
-    private JButton createColorButton(String color) {
+    private JButton createColorButton(String color) 
+    {
         JButton button = new JButton();
         button.setBackground(Color.decode(color));
         button.setPreferredSize(new Dimension(50, 50));
-        button.addActionListener(e -> {
+        button.addActionListener(e -> 
+        {
             if (selectedSection != null) {
                 selectedSection.setBackground(Color.decode(color));
             } else if (selectedColorButton != null) {
