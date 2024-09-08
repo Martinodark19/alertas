@@ -63,4 +63,6 @@ public class DatabaseConnection
 
         return alertList; // Devolver la lista de las nuevas alertas ordenadas por alertaId ascendente
     }
+
+    
 }

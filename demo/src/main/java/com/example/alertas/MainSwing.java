@@ -13,7 +13,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -313,7 +316,8 @@ public class MainSwing {
                         // Lógica para mostrar la figura en la sección correspondiente
                         showAlertsToSection = true;
 
-                        if (showAlertsToSection) {
+                        if (showAlertsToSection) 
+                        {
                             // Secciones disponibles
                             int[] seccionesDisponibles = { 1, 3, 5, 7 };
                             // Selección aleatoria de una sección disponible
@@ -330,7 +334,8 @@ public class MainSwing {
 
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) {
+                            switch (alertaConfig.getForma()) 
+                            {
                                 case "Círculo":
                                     figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
                                             new Object[][] { alert });
@@ -557,14 +562,13 @@ public class MainSwing {
                 } 
                 else 
                 {
-                    sectionsPanel.removeAll();
+
+                    addSpecificSectionsFromMap();
                     sectionsPanel.revalidate();
                     sectionsPanel.repaint();
-                    addSpecificSections();
                     configuracion.setSectionCount("8 secciones");
 
                 }
-
             }
         });
         // logica para almacenar en memoria ocultar tabla
@@ -590,134 +594,64 @@ public class MainSwing {
     }
 
 
-    private void removeSpecificSections(int[] sectionsToRemove) 
+// Define un mapa para almacenar las secciones eliminadas
+private Map<Integer, JPanel> removedSectionsMap = new LinkedHashMap<>();
+
+
+// Método modificado para eliminar y almacenar las secciones en orden y su índice
+private void removeSpecificSections(int[] sectionsToRemove) 
+{
+    List<Component> toRemove = new ArrayList<>();
+    // Recolectar los paneles a eliminar y almacenarlos en el mapa con su índice
+    Component[] components = sectionsPanel.getComponents();
+    for (int i = 0; i < components.length; i++) 
     {
-        List<Component> toRemove = new ArrayList<>();
-        // Recolectar los paneles a eliminar
-        for (Component comp : sectionsPanel.getComponents()) 
-        {
-            if (comp instanceof JPanel) 
-            {
-                JPanel panel = (JPanel) comp;
-                int sectionNumber = Integer.parseInt(panel.getName().substring(8));
-                for (int section : sectionsToRemove) 
-                {
-                    if (section == sectionNumber) 
-                    {
-                        toRemove.add(panel);
-                        break;
-                    }
+        if (components[i] instanceof JPanel) {
+            JPanel panel = (JPanel) components[i];
+            int sectionNumber = Integer.parseInt(panel.getName().substring(8)); // Obtener el número de sección
+            for (int section : sectionsToRemove) {
+                if (section == sectionNumber) {
+                    toRemove.add(panel);
+                    // Almacenar la sección eliminada junto con su índice en el LinkedHashMap
+                    removedSectionsMap.put(i, panel);
+                    break;
                 }
             }
         }
-
-        // Eliminar los paneles recolectados
-        for (Component comp : toRemove) 
-        {
-            sectionsPanel.remove(comp);
-        }
-        // Actualizar el panel después de la eliminación
-        sectionsPanel.revalidate();
-        sectionsPanel.repaint();
     }
 
-    private void addSpecificSections() 
+    // Eliminar los paneles recolectados del panel principal
+    for (Component comp : toRemove) {
+        sectionsPanel.remove(comp);
+    }
+
+    // Actualizar el panel después de la eliminación
+    sectionsPanel.revalidate();
+    sectionsPanel.repaint();
+}
+
+
+// Método para agregar secciones desde el mapa en la posición original
+private void addSpecificSectionsFromMap() 
+{
+    // Recorre las secciones eliminadas en el mapa en el orden de inserción
+    for (Map.Entry<Integer, JPanel> entry : removedSectionsMap.entrySet()) 
     {
-        for (int i = 1; i <= 8; i++) {
-            JPanel sectionPanel = new JPanel(new BorderLayout());
-            sectionPanel.setBackground(Color.decode("#cccccc"));
-            sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
-            sectionPanel.setName("Section-" + i);
+        int index = entry.getKey();
+        JPanel panel = entry.getValue();
 
-            // Contenido de la sección
-            JLabel sectionLabel = new JLabel("Section " + i, SwingConstants.CENTER);
-            sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Reducimos la fuente
-
-            // Panel para la figura
-            labelsPanel = new JPanel(new GridLayout(2, 1));
-            labelsPanel.setOpaque(false); // Mantener el fondo de la sección
-            labelsPanel.add(sectionLabel);
-
-            // Panel dedicado a las figuras, separado del contenido principal
-            figuresPanel = new JPanel(); // Empezamos con las figuras a la derecha
-            figuresPanel.setOpaque(false); // Para mantener el fondo del panel principal
-            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.Y_AXIS));
-            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.X_AXIS)); // Alinear las figuras
-                                                                                   // horizontalmente
-            figuresPanel.setMinimumSize(new Dimension(36, 36)); // Tamaño mínimo de las figuras
-            figuresPanel.setMaximumSize(new Dimension(36, 36)); // Tamaño máximo de las figuras
-
-            // Panel dedicado a las figuras, separado del contenido principal
-            figuresPanelLeft = new JPanel(); // Empezamos con las figuras a la derecha
-            figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
-            figuresPanelLeft.add(figuresPanel);
-            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.Y_AXIS));
-            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS)); // Alinear las figuras
-                                                                                           // horizontalmente
-            figuresPanelLeft.setMinimumSize(new Dimension(39, 39)); // Tamaño mínimo de las figuras
-            figuresPanelLeft.setMaximumSize(new Dimension(39, 39)); // Tamaño máximo de las figuras
-
-            // Botón de Cambiar Color
-            JButton changeColorButton = new JButton("Cambiar Color");
-            changeColorButton.setBackground(Color.decode("#009dad"));
-            changeColorButton.setForeground(Color.WHITE);
-            changeColorButton.setFont(new Font("Arial", Font.PLAIN, 8));
-            changeColorButton.setMargin(new Insets(0, 0, 0, 0));
-            changeColorButton.setBorderPainted(false);
-            changeColorButton.setFocusPainted(false);
-            changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
-
-            changeColorButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    selectedSection = sectionPanel;
-                    showColorPickerModal(frame);
-                }
-            });
-
-            // Botón de Cambiar Título
-            JButton changeTitleButton = new JButton("Cambiar Título");
-            changeTitleButton.setBackground(Color.decode("#f39c12"));
-            changeTitleButton.setForeground(Color.WHITE);
-            changeTitleButton.setFont(new Font("Arial", Font.PLAIN, 8));
-            changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
-            changeTitleButton.setBorderPainted(false);
-            changeTitleButton.setFocusPainted(false);
-            changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
-
-            changeTitleButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    selectedSectionLabel = sectionLabel;
-                    showTitleChangeModal(frame);
-                }
-            });
-
-            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
-            // otro
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
-            buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
-
-            // Alinear los botones a la derecha dentro del panel vertical
-            buttonPanel.add(changeColorButton);
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Espacio entre los botones
-            buttonPanel.add(changeTitleButton);
-
-            // Crear un panel envolvente que colocará los botones alineados a la derecha
-            JPanel wrapperPanel = new JPanel(new BorderLayout());
-            wrapperPanel.setOpaque(false); // Mantener el fondo del panel transparente
-            wrapperPanel.add(buttonPanel, BorderLayout.EAST); // Colocar los botones a la derecha
-
-            // Añadir el contenido central y el wrapperPanel en la sección
-            sectionPanel.add(labelsPanel, BorderLayout.CENTER);
-            sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
-            sectionPanel.add(figuresPanel, BorderLayout.EAST);
-            sectionPanel.add(figuresPanelLeft, BorderLayout.WEST);
-
-            sectionsPanel.add(sectionPanel);
-        }
+        // Inserta el panel en su posición original
+        sectionsPanel.add(panel, index);
     }
+
+    // Actualizar el panel después de añadir las secciones
+    sectionsPanel.revalidate();
+    sectionsPanel.repaint();
+
+    // Limpiar el mapa después de reinsertar las secciones
+    removedSectionsMap.clear();
+}
+
 
     private void openPopupWithTable(Object[][] alertData) 
     {
