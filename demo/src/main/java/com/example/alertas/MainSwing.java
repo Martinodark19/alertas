@@ -301,15 +301,27 @@ public class MainSwing {
         timerForUpdateConfigMs.start();
 
         // timer para ejecutar las consultas esporadicas a la base de datos
-        timer = new Timer(timeForTimmerUpdated, new ActionListener() {
+        timer = new Timer(timeForTimmerUpdated, new ActionListener() 
+        {
             private int lastProcessedId = 0;
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) 
+            {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
 
-                if (!newAlerts.isEmpty()) {
-                    for (Object[] alert : newAlerts) {
+                // Convert List<Object[]> to Object[][]
+                Object[][] alertsArray = new Object[newAlerts.size()][];
+                alertsArray = newAlerts.toArray(alertsArray);
+
+                List<Object[]> alertasConPermisosAd = DatabaseConnection.filtrarAlertasConPermiso(alertsArray);
+
+                // aqui le debo enviar ese array a otro metodo para que nos retorne el array 
+
+                if (!alertasConPermisosAd.isEmpty()) 
+                {
+                    for (Object[] alert : alertasConPermisosAd) 
+                    {
                         alertTableModel.insertRow(0, alert); // Inserta en la primera posición
                         lastAlertForPopup = alert;
 
@@ -331,7 +343,7 @@ public class MainSwing {
                             JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
                                                                                         // componente que debería
                                                                                         // ser labelsPanel
-
+                                                                                        
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
                             switch (alertaConfig.getForma()) 

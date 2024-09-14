@@ -64,5 +64,30 @@ public class DatabaseConnection
         return alertList; // Devolver la lista de las nuevas alertas ordenadas por alertaId ascendente
     }
 
+
+       
+
+        // Método que recibe un array de alertas y filtra las que tengan "proceso" igual a "MQoS"
+        public static List<Object[]> filtrarAlertasConPermiso(Object[][] alertas) 
+        {
+            List<Object[]> alertasConPermisos = new ArrayList<>();
+    
+            // Recorrer el array de alertas
+            for (Object[] alerta : alertas) 
+            {
+                String proceso = (String) alerta[7]; // El campo proceso se asume en la posición 7 del array
+    
+                // Compara si el campo proceso es igual a "MQoS"
+                if ("MQoS".equals(proceso)) 
+                {
+                    alertasConPermisos.add(alerta); // Añadir la alerta al nuevo array si el proceso es "MQoS"
+                }
+            }
+    
+            return alertasConPermisos; // Retornar el array con las alertas filtradas
+        }
+
+
+
     
 }
