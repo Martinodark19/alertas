@@ -11,7 +11,8 @@ public class DatabaseConnection
     public static List<Object[]> fetchAlertsAfterId(int lastId) 
     {
         List<Object[]> alertList = new ArrayList<>();
-        String query = "SELECT * FROM dbo.alertas WHERE alertaId > ? ORDER BY alertaId ASC"; 
+        String query = "SELECT * FROM dbo.alertas WHERE alertaId > ? ORDER BY alertaId ASC";
+        System.out.println("paso por DatabaseConnection"); 
 
         try (Connection connection = DriverManager.getConnection(DB_URL);
              PreparedStatement statement = connection.prepareStatement(query)) 

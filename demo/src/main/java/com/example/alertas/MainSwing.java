@@ -21,7 +21,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class MainSwing {
+public class MainSwing 
+{
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
     JPanel sectionsPanel;
@@ -90,7 +91,8 @@ public class MainSwing {
     // Método para configurar y dibujar la figura según la configuración de la
     // alerta
 
-    public MainSwing() {
+    public MainSwing() 
+    {
 
         JFrame frame = new JFrame("Mi App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -235,7 +237,8 @@ public class MainSwing {
         tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
 
         // Tabla de alertas con scroll horizontal
-        String[] alertColumns = {
+        String[] alertColumns = 
+        {
                 "Alerta ID", // alertaid
                 "Código Alerta", // codalerta
                 "Nombre", // nombre
@@ -277,7 +280,8 @@ public class MainSwing {
         timeForTimmerUpdated = configuracion.getUpdateFrequency();
 
         // Crear un nuevo Timer con la nueva frecuencia
-        Timer timerForUpdateConfigMs = new Timer(1000, new ActionListener() {
+        Timer timerForUpdateConfigMs = new Timer(1000, new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 timer.start();
@@ -309,7 +313,7 @@ public class MainSwing {
             public void actionPerformed(ActionEvent e) 
             {
                 List<Object[]> newAlerts = databaseConnection.fetchAlertsAfterId(lastProcessedId);
-
+            
                 // Convert List<Object[]> to Object[][]
                 Object[][] alertsArray = new Object[newAlerts.size()][];
                 alertsArray = newAlerts.toArray(alertsArray);
@@ -399,6 +403,94 @@ public class MainSwing {
                     lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
 
                     alertTableModel.fireTableDataChanged();
+                }
+                // este sera el caso de que no tenga los permisos
+                else
+                {
+                    if (!newAlerts.isEmpty()) 
+                    {
+                        for (Object[] alert : newAlerts) 
+                    {
+                        alertTableModel.insertRow(0, alert); // Inserta en la primera posición
+                        lastAlertForPopup = alert;
+
+                        // Lógica para mostrar la figura en la sección correspondiente
+                        showAlertsToSection = true;
+
+                        if (showAlertsToSection) 
+                        {
+                            // Secciones disponibles
+                            int[] seccionesDisponibles = { 1, 3, 5, 7 };
+                            // Selección aleatoria de una sección disponible
+                            int randomIndex = (int) (Math.random() * seccionesDisponibles.length);
+                            int sectionIndex = seccionesDisponibles[randomIndex];
+
+                            // Ahora `sectionIndex` será 1, 3, 5, o 7
+                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1);
+
+                            // Obtén el `labelsPanel` de esa sección para añadir la figura
+                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
+                                                                                        // componente que debería
+                                                                                        // ser labelsPanel
+                                                                                        
+                            // Seleccionar la figura basada en la configuración de la alerta
+                            JPanel figuraPanel;
+                            switch (alertaConfig.getForma()) 
+                            {
+                                case "Círculo":
+                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
+                                            new Object[][] { alert });
+                                    if (popupCheckBox.isSelected()) {
+                                        openPopupWithTable(new Object[][] { alert });
+                                    }
+                                    break;
+                                case "Cuadrado":
+                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
+                                            new Object[][] { alert });
+                                    if (popupCheckBox.isSelected()) {
+                                        openPopupWithTable(new Object[][] { alert });
+                                    }
+
+                                    break;
+                                case "Triángulo":
+                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
+                                            new Object[][] { alert });
+                                    if (popupCheckBox.isSelected()) {
+                                        openPopupWithTable(new Object[][] { alert });
+                                    }
+                                    break;
+                                default:
+                                    figuraPanel = new JPanel(); // En caso de error o forma no reconocida
+                                    break;
+                            }
+
+                            // Añadir la figura al `labelsPanel` en la sección específica
+                            labelsPanel.add(figuraPanel);
+                            labelsPanel.revalidate();
+                            labelsPanel.repaint();
+
+                            JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer
+                                                                                            // componente,
+
+                            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                            executor.schedule(() -> {
+                                // Código a ejecutar después del delay
+                                labelsPanel.removeAll();
+                                labelsPanelLeft.add(figuraPanel);
+                                labelsPanelLeft.revalidate();
+                                labelsPanelLeft.repaint();
+                            }, 2, TimeUnit.SECONDS);
+                            executor.shutdown();
+                        }
+                    }
+
+                    // Actualizar el último alertId procesado
+                    lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
+
+                    alertTableModel.fireTableDataChanged();
+
+                    }
+                    
                 }
             }
         });

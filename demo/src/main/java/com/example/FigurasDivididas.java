@@ -159,19 +159,22 @@ public class FigurasDivididas
         }
     }
 
-    public static class TrianguloPanel extends JPanel {
+    public static class TrianguloPanel extends JPanel 
+    {
         private Color color;
         private Object[][] data;
         private int borderWidth = 1; // Grosor del borde
 
 
-        public TrianguloPanel(Color color, Object[][] data) {
+        public TrianguloPanel(Color color, Object[][] data) 
+        {
             this.color = color;
             this.data = data;
             this.setOpaque(false);
             this.setPreferredSize(new Dimension(30, 30));
 
-            this.addMouseListener(new MouseAdapter() {
+            this.addMouseListener(new MouseAdapter() 
+            {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     openDetailWindow();
@@ -194,12 +197,14 @@ public class FigurasDivididas
             g2d.drawPolygon(xPoints, yPoints, 3); // Dibuja el borde del triángulo
         }
 
-        private void openDetailWindow() {
+        private void openDetailWindow() 
+        {
             JFrame detailFrame = new JFrame("Detalle del Triángulo");
             detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             detailFrame.setLayout(new BorderLayout());
 
-            String[] columnNames = {
+            String[] columnNames = 
+            {
                 "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
                 "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio", 
                 "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
