@@ -17,9 +17,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+
 
 public class MainSwing 
 {
@@ -334,19 +337,23 @@ public class MainSwing
 
                         if (showAlertsToSection) 
                         {
-                            // Secciones disponibles
+                            // Array de secciones disponibles
                             int[] seccionesDisponibles = { 1, 3, 5, 7 };
-                            // Selección aleatoria de una sección disponible
-                            int randomIndex = (int) (Math.random() * seccionesDisponibles.length);
+
+                            // Generar un número aleatorio basado en el tamaño del array
+                            Random random = new Random();
+                            int randomIndex = random.nextInt(seccionesDisponibles.length); // Índice aleatorio
+                            // Obtener la sección aleatoria
                             int sectionIndex = seccionesDisponibles[randomIndex];
 
                             // Ahora `sectionIndex` será 1, 3, 5, o 7
                             JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1);
-
                             // Obtén el `labelsPanel` de esa sección para añadir la figura
                             JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
                                                                                         // componente que debería
                                                                                         // ser labelsPanel
+
+                                                                                        
                                                                                         
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
@@ -419,69 +426,78 @@ public class MainSwing
 
                         if (showAlertsToSection) 
                         {
-                            // Secciones disponibles
-                            int[] seccionesDisponibles = { 1, 3, 5, 7 };
-                            // Selección aleatoria de una sección disponible
-                            int randomIndex = (int) (Math.random() * seccionesDisponibles.length);
+                            // Array de secciones disponibles
+
+                            int[] seccionesDisponibles = { 0, 2, 4, 6};
+
+                            // Generar un número aleatorio basado en el tamaño del array
+                            Random random = new Random();
+                            int randomIndex = random.nextInt(seccionesDisponibles.length); // Índice aleatorio
+                            // Obtener la sección aleatoria
                             int sectionIndex = seccionesDisponibles[randomIndex];
 
                             // Ahora `sectionIndex` será 1, 3, 5, o 7
-                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1);
 
-                            // Obtén el `labelsPanel` de esa sección para añadir la figura
-                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
-                                                                                        // componente que debería
-                                                                                        // ser labelsPanel
-                                                                                        
-                            // Seleccionar la figura basada en la configuración de la alerta
-                            JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) 
+                            if (sectionIndex  < sectionsPanel.getComponentCount())
                             {
-                                case "Círculo":
-                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
-                                            new Object[][] { alert });
-                                    if (popupCheckBox.isSelected()) {
-                                        openPopupWithTable(new Object[][] { alert });
-                                    }
-                                    break;
-                                case "Cuadrado":
-                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
-                                            new Object[][] { alert });
-                                    if (popupCheckBox.isSelected()) {
-                                        openPopupWithTable(new Object[][] { alert });
+                                    JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex);
+
+                                    // Obtén el `labelsPanel` de esa sección para añadir la figura
+                                    JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
+                                                                                                // componente que debería
+                                                                                                // ser labelsPanel
+                                            
+                                    //Seleccionar la figura basada en la configuración de la alerta
+                                    JPanel figuraPanel;
+                                    switch (alertaConfig.getForma()) 
+                                    {
+                                        case "Círculo":
+                                            figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
+                                                    new Object[][] { alert });
+                                            if (popupCheckBox.isSelected()) {
+                                                openPopupWithTable(new Object[][] { alert });
+                                            }
+                                            break;
+                                        case "Cuadrado":
+                                            figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
+                                                    new Object[][] { alert });
+                                            if (popupCheckBox.isSelected()) {
+                                                openPopupWithTable(new Object[][] { alert });
+                                            }
+
+                                            break;
+                                        case "Triángulo":
+                                            figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
+                                                    new Object[][] { alert });
+                                            if (popupCheckBox.isSelected()) {
+                                                openPopupWithTable(new Object[][] { alert });
+                                            }
+                                            break;
+                                        default:
+                                            figuraPanel = new JPanel(); // En caso de error o forma no reconocida
+                                            break;
                                     }
 
-                                    break;
-                                case "Triángulo":
-                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
-                                            new Object[][] { alert });
-                                    if (popupCheckBox.isSelected()) {
-                                        openPopupWithTable(new Object[][] { alert });
-                                    }
-                                    break;
-                                default:
-                                    figuraPanel = new JPanel(); // En caso de error o forma no reconocida
-                                    break;
+                                    // Añadir la figura al `labelsPanel` en la sección específica
+                                    labelsPanel.add(figuraPanel);
+                                    labelsPanel.revalidate();
+                                    labelsPanel.repaint();
+
+                                    JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer
+                                                                                                    // componente,
+
+                                    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                                    executor.schedule(() -> {
+                                        // Código a ejecutar después del delay
+                                        labelsPanel.removeAll();
+                                        labelsPanelLeft.add(figuraPanel);
+                                        labelsPanelLeft.revalidate();
+                                        labelsPanelLeft.repaint();
+                                    }, 2, TimeUnit.SECONDS);
+                                    executor.shutdown();
+                                }
                             }
 
-                            // Añadir la figura al `labelsPanel` en la sección específica
-                            labelsPanel.add(figuraPanel);
-                            labelsPanel.revalidate();
-                            labelsPanel.repaint();
-
-                            JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer
-                                                                                            // componente,
-
-                            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-                            executor.schedule(() -> {
-                                // Código a ejecutar después del delay
-                                labelsPanel.removeAll();
-                                labelsPanelLeft.add(figuraPanel);
-                                labelsPanelLeft.revalidate();
-                                labelsPanelLeft.repaint();
-                            }, 2, TimeUnit.SECONDS);
-                            executor.shutdown();
-                        }
                     }
 
                     // Actualizar el último alertId procesado
@@ -620,7 +636,6 @@ public class MainSwing
         JComboBox<String> sectionComboBox = new JComboBox<>(sectionOptions);
         sectionComboBox.setSelectedItem(configuracion.getSectionCount());
 
-
         // Botón para guardar los cambios
         JButton applyButton = new JButton("Guardar");
 
@@ -662,16 +677,14 @@ public class MainSwing
                 {
                     configuracion.setSectionCount("4 secciones");
                     // Eliminar secciones específicas
-                    removeSpecificSections(new int[] { 2, 4, 6, 8 });
+                    removeSpecificSections(new int[] {2,4,6,8});
                 } 
                 else 
                 {
-
                     addSpecificSectionsFromMap();
                     sectionsPanel.revalidate();
                     sectionsPanel.repaint();
                     configuracion.setSectionCount("8 secciones");
-
                 }
             }
         });
@@ -712,8 +725,9 @@ private void removeSpecificSections(int[] sectionsToRemove)
     {
         if (components[i] instanceof JPanel) {
             JPanel panel = (JPanel) components[i];
-            int sectionNumber = Integer.parseInt(panel.getName().substring(8)); // Obtener el número de sección
-            for (int section : sectionsToRemove) {
+            int sectionNumber = Integer.parseInt(panel.getName().substring(8)); // Obtener el número de sección            
+            for (int section : sectionsToRemove) 
+            {
                 if (section == sectionNumber) {
                     toRemove.add(panel);
                     // Almacenar la sección eliminada junto con su índice en el LinkedHashMap
@@ -726,6 +740,7 @@ private void removeSpecificSections(int[] sectionsToRemove)
 
     // Eliminar los paneles recolectados del panel principal
     for (Component comp : toRemove) {
+
         sectionsPanel.remove(comp);
     }
 

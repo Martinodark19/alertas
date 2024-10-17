@@ -1,6 +1,10 @@
 package com.example.alertas;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +16,6 @@ public class DatabaseConnection
     {
         List<Object[]> alertList = new ArrayList<>();
         String query = "SELECT * FROM dbo.alertas WHERE alertaId > ? ORDER BY alertaId ASC";
-        System.out.println("paso por DatabaseConnection"); 
 
         try (Connection connection = DriverManager.getConnection(DB_URL);
              PreparedStatement statement = connection.prepareStatement(query)) 
