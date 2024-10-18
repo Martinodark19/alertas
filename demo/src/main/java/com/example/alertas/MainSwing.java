@@ -22,8 +22,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
-
 public class MainSwing 
 {
 
@@ -346,29 +344,26 @@ public class MainSwing
 
                         if (showAlertsToSection) 
                         {
-                           
-                                // Array de secciones disponibles
+                            // Array de secciones disponibles
+                            int[] seccionesEspecificas  = { 0, 2, 4, 6};
 
-                                int[] seccionesEspecificas  = { 0, 2, 4, 6};
+                            Map<Integer, JPanel> seccionesMap = new LinkedHashMap<>();
 
-                                Map<Integer, JPanel> seccionesMap = new LinkedHashMap<>();
-
-
-                                for (int section : seccionesEspecificas) 
+                            for (int sectionIndex : seccionesEspecificas) 
+                            {
+                                JPanel sectionPanel = allSections.get(sectionIndex + 1); // Ajuste de índice
+                                if (sectionPanel != null && sectionPanel.getParent() != null) 
                                 {
-                                    seccionesMap.put(section, (JPanel) sectionsPanel.getComponent(section)); // Añadir al mapa
+                                    seccionesMap.put(sectionIndex, sectionPanel); // Añadir al mapa
                                 }
+                            }
+                            // Obtener un valor aleatorio
+                            JPanel randomValue = getRandomValueFromMap(seccionesMap);
+                            System.out.println("Sección aleatoria: " + randomValue);
 
-                                // Obtener un valor aleatorio
-                                JPanel randomValue = getRandomValueFromMap(seccionesMap);
-                                System.out.println("Sección aleatoria: " + randomValue);
-                                                                
-                                // Obtén el `labelsPanel` de esa sección para añadir la figura
-                                        JPanel labelsPanel = (JPanel) randomValue.getComponent(2); // Obtén el primer
-                                                                                                    // componente que debería
-                                                                                                    // ser labelsPanel
-                                                                                        
-                                                                                        
+                            // Obtén el `labelsPanel` de esa sección para añadir la figura
+                            JPanel labelsPanel = (JPanel) randomValue.getComponent(2);
+                                                                                                                                              
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
                             switch (alertaConfig.getForma()) 
@@ -446,25 +441,25 @@ public class MainSwing
 
                                 Map<Integer, JPanel> seccionesMap = new LinkedHashMap<>();
 
-
                                 for (int sectionIndex : seccionesEspecificas) 
                                 {
                                     JPanel sectionPanel = allSections.get(sectionIndex + 1); // Ajuste de índice
-                                    if (sectionPanel != null && sectionPanel.getParent() != null) {
+                                    if (sectionPanel != null && sectionPanel.getParent() != null) 
+                                    {
                                         seccionesMap.put(sectionIndex, sectionPanel); // Añadir al mapa
                                     }
                                 }
+
                                 // Obtener un valor aleatorio
                                 JPanel randomValue = getRandomValueFromMap(seccionesMap);
-                                System.out.println("Sección aleatoria: " + randomValue);
                                                                 
                                 // Obtén el `labelsPanel` de esa sección para añadir la figura
-                                        JPanel labelsPanel = (JPanel) randomValue.getComponent(2); // Obtén el primer
+                                JPanel labelsPanel = (JPanel) randomValue.getComponent(2); // Obtén el primer
                                                                                                     // componente que debería
                                                                                                     // ser labelsPanel
                                                 
-                                        //Seleccionar la figura basada en la configuración de la alerta
-                                        JPanel figuraPanel;
+                                //Seleccionar la figura basada en la configuración de la alerta
+                                JPanel figuraPanel;
                                         switch (alertaConfig.getForma()) 
                                         {
                                             case "Círculo":
@@ -494,7 +489,7 @@ public class MainSwing
                                                 break;
                                         }
 
-                                        // Añadir la figura al `labelsPanel` en la sección específica
+                                            // Añadir la figura al `labelsPanel` en la sección específica
                                         labelsPanel.add(figuraPanel);
                                         labelsPanel.revalidate();
                                         labelsPanel.repaint();
@@ -746,12 +741,14 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
     for (int index : sectionsToAdd) {
         JPanel sectionPanel = allSections.get(index);
         if (sectionPanel != null && sectionPanel.getParent() == null) {
-            sectionsPanel.add(sectionPanel);
+            // Agrega la sección en su posición original
+            sectionsPanel.add(sectionPanel, index - 1); // Restamos 1 si los índices comienzan en 1
         }
     }
     sectionsPanel.revalidate();
     sectionsPanel.repaint();
 }
+
 
 
     private void openPopupWithTable(Object[][] alertData) 
