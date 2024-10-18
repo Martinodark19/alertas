@@ -26,6 +26,10 @@ import java.util.concurrent.TimeUnit;
 
 public class MainSwing 
 {
+
+    // map para almacenar las secciones
+    private Map<Integer, JPanel> allSections = new HashMap<>();
+
     private JPanel selectedSection;
     private JLabel selectedSectionLabel; // Para cambiar el título de la sección
     JPanel sectionsPanel;
@@ -125,6 +129,12 @@ public class MainSwing
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
+
+
+        // Configuración de las secciones para que ocupen menos espacio en la pantalla
+        sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
+
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
         sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
@@ -145,23 +155,19 @@ public class MainSwing
             labelsPanel.add(sectionLabel);
 
             // Panel dedicado a las figuras, separado del contenido principal
-            figuresPanel = new JPanel(); // Empezamos con las figuras a la derecha
-            figuresPanel.setOpaque(false); // Para mantener el fondo del panel principal
-            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.Y_AXIS));
-            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.X_AXIS)); // Alinear las figuras
-                                                                                   // horizontalmente
-            figuresPanel.setMinimumSize(new Dimension(36, 36)); // Tamaño mínimo de las figuras
-            figuresPanel.setMaximumSize(new Dimension(36, 36)); // Tamaño máximo de las figuras
+            figuresPanel = new JPanel();
+            figuresPanel.setOpaque(false);
+            figuresPanel.setLayout(new BoxLayout(figuresPanel, BoxLayout.X_AXIS));
+            figuresPanel.setMinimumSize(new Dimension(36, 36));
+            figuresPanel.setMaximumSize(new Dimension(36, 36));
 
-            // Panel dedicado a las figuras, separado del contenido principal
-            figuresPanelLeft = new JPanel(); // Empezamos con las figuras a la derecha
-            figuresPanelLeft.setOpaque(false); // Para mantener el fondo del panel principal
+            // Panel para figuras a la izquierda
+            figuresPanelLeft = new JPanel();
+            figuresPanelLeft.setOpaque(false);
             figuresPanelLeft.add(figuresPanel);
-            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.Y_AXIS));
-            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS)); // Alinear las figuras
-                                                                                           // horizontalmente
-            figuresPanelLeft.setMinimumSize(new Dimension(39, 39)); // Tamaño mínimo de las figuras
-            figuresPanelLeft.setMaximumSize(new Dimension(39, 39)); // Tamaño máximo de las figuras
+            figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS));
+            figuresPanelLeft.setMinimumSize(new Dimension(39, 39));
+            figuresPanelLeft.setMaximumSize(new Dimension(39, 39));
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -171,11 +177,12 @@ public class MainSwing
             changeColorButton.setMargin(new Insets(0, 0, 0, 0));
             changeColorButton.setBorderPainted(false);
             changeColorButton.setFocusPainted(false);
-            changeColorButton.setPreferredSize(new Dimension(68, 25)); // Reducimos el tamaño del botón
+            changeColorButton.setPreferredSize(new Dimension(68, 25));
 
             changeColorButton.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(ActionEvent e) 
+                {
                     selectedSection = sectionPanel;
                     showColorPickerModal(frame);
                 }
@@ -189,7 +196,7 @@ public class MainSwing
             changeTitleButton.setMargin(new Insets(0, 0, 0, 0));
             changeTitleButton.setBorderPainted(false);
             changeTitleButton.setFocusPainted(false);
-            changeTitleButton.setPreferredSize(new Dimension(65, 25)); // Reducimos el tamaño del botón
+            changeTitleButton.setPreferredSize(new Dimension(65, 25));
 
             changeTitleButton.addActionListener(new ActionListener() {
                 @Override
@@ -199,30 +206,32 @@ public class MainSwing
                 }
             });
 
-            // Panel para los botones, utilizando BoxLayout para colocarlos uno encima del
-            // otro
+            // Panel para los botones
             JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Disposición vertical
-            buttonPanel.setOpaque(false); // Mantener el fondo del panel transparente
-
-            // Alinear los botones a la derecha dentro del panel vertical
+            buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+            buttonPanel.setOpaque(false);
             buttonPanel.add(changeColorButton);
-            buttonPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Espacio entre los botones
+            buttonPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             buttonPanel.add(changeTitleButton);
 
-            // Crear un panel envolvente que colocará los botones alineados a la derecha
+            // Panel envolvente para los botones
             JPanel wrapperPanel = new JPanel(new BorderLayout());
-            wrapperPanel.setOpaque(false); // Mantener el fondo del panel transparente
-            wrapperPanel.add(buttonPanel, BorderLayout.EAST); // Colocar los botones a la derecha
+            wrapperPanel.setOpaque(false);
+            wrapperPanel.add(buttonPanel, BorderLayout.EAST);
 
-            // Añadir el contenido central y el wrapperPanel en la sección
+            // Añadir componentes a la sección
             sectionPanel.add(labelsPanel, BorderLayout.CENTER);
-            sectionPanel.add(wrapperPanel, BorderLayout.SOUTH); // Colocar los botones en la parte inferior derecha
+            sectionPanel.add(wrapperPanel, BorderLayout.SOUTH);
             sectionPanel.add(figuresPanel, BorderLayout.EAST);
             sectionPanel.add(figuresPanelLeft, BorderLayout.WEST);
 
+            // Añadir la sección al sectionsPanel
             sectionsPanel.add(sectionPanel);
+
+            // Añadir la sección al Map con su índice
+            allSections.put(i, sectionPanel);
         }
+
 
         // Actualizar el panel para mostrar la nueva configuración
         sectionsPanel.revalidate();
@@ -337,22 +346,27 @@ public class MainSwing
 
                         if (showAlertsToSection) 
                         {
-                            // Array de secciones disponibles
-                            int[] seccionesDisponibles = { 1, 3, 5, 7 };
+                           
+                                // Array de secciones disponibles
 
-                            // Generar un número aleatorio basado en el tamaño del array
-                            Random random = new Random();
-                            int randomIndex = random.nextInt(seccionesDisponibles.length); // Índice aleatorio
-                            // Obtener la sección aleatoria
-                            int sectionIndex = seccionesDisponibles[randomIndex];
+                                int[] seccionesEspecificas  = { 0, 2, 4, 6};
 
-                            // Ahora `sectionIndex` será 1, 3, 5, o 7
-                            JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex - 1);
-                            // Obtén el `labelsPanel` de esa sección para añadir la figura
-                            JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
-                                                                                        // componente que debería
-                                                                                        // ser labelsPanel
+                                Map<Integer, JPanel> seccionesMap = new LinkedHashMap<>();
 
+
+                                for (int section : seccionesEspecificas) 
+                                {
+                                    seccionesMap.put(section, (JPanel) sectionsPanel.getComponent(section)); // Añadir al mapa
+                                }
+
+                                // Obtener un valor aleatorio
+                                JPanel randomValue = getRandomValueFromMap(seccionesMap);
+                                System.out.println("Sección aleatoria: " + randomValue);
+                                                                
+                                // Obtén el `labelsPanel` de esa sección para añadir la figura
+                                        JPanel labelsPanel = (JPanel) randomValue.getComponent(2); // Obtén el primer
+                                                                                                    // componente que debería
+                                                                                                    // ser labelsPanel
                                                                                         
                                                                                         
                             // Seleccionar la figura basada en la configuración de la alerta
@@ -391,7 +405,7 @@ public class MainSwing
                             labelsPanel.revalidate();
                             labelsPanel.repaint();
 
-                            JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer
+                            JPanel labelsPanelLeft = (JPanel) randomValue.getComponent(3); // Obtén el primer
                                                                                             // componente,
 
                             ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -417,88 +431,90 @@ public class MainSwing
                     if (!newAlerts.isEmpty()) 
                     {
                         for (Object[] alert : newAlerts) 
-                    {
-                        alertTableModel.insertRow(0, alert); // Inserta en la primera posición
-                        lastAlertForPopup = alert;
-
-                        // Lógica para mostrar la figura en la sección correspondiente
-                        showAlertsToSection = true;
-
-                        if (showAlertsToSection) 
                         {
-                            // Array de secciones disponibles
+                            alertTableModel.insertRow(0, alert); // Inserta en la primera posición
+                            lastAlertForPopup = alert;
 
-                            int[] seccionesDisponibles = { 0, 2, 4, 6};
+                            // Lógica para mostrar la figura en la sección correspondiente
+                            showAlertsToSection = true;
 
-                            // Generar un número aleatorio basado en el tamaño del array
-                            Random random = new Random();
-                            int randomIndex = random.nextInt(seccionesDisponibles.length); // Índice aleatorio
-                            // Obtener la sección aleatoria
-                            int sectionIndex = seccionesDisponibles[randomIndex];
-
-                            // Ahora `sectionIndex` será 1, 3, 5, o 7
-
-                            if (sectionIndex  < sectionsPanel.getComponentCount())
+                            if (showAlertsToSection) 
                             {
-                                    JPanel sectionPanel = (JPanel) sectionsPanel.getComponent(sectionIndex);
+                                // Array de secciones disponibles
 
-                                    // Obtén el `labelsPanel` de esa sección para añadir la figura
-                                    JPanel labelsPanel = (JPanel) sectionPanel.getComponent(2); // Obtén el primer
-                                                                                                // componente que debería
-                                                                                                // ser labelsPanel
-                                            
-                                    //Seleccionar la figura basada en la configuración de la alerta
-                                    JPanel figuraPanel;
-                                    switch (alertaConfig.getForma()) 
-                                    {
-                                        case "Círculo":
-                                            figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
-                                                    new Object[][] { alert });
-                                            if (popupCheckBox.isSelected()) {
-                                                openPopupWithTable(new Object[][] { alert });
-                                            }
-                                            break;
-                                        case "Cuadrado":
-                                            figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
-                                                    new Object[][] { alert });
-                                            if (popupCheckBox.isSelected()) {
-                                                openPopupWithTable(new Object[][] { alert });
-                                            }
+                                int[] seccionesEspecificas  = { 0, 2, 4, 6};
 
-                                            break;
-                                        case "Triángulo":
-                                            figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
-                                                    new Object[][] { alert });
-                                            if (popupCheckBox.isSelected()) {
-                                                openPopupWithTable(new Object[][] { alert });
-                                            }
-                                            break;
-                                        default:
-                                            figuraPanel = new JPanel(); // En caso de error o forma no reconocida
-                                            break;
+                                Map<Integer, JPanel> seccionesMap = new LinkedHashMap<>();
+
+
+                                for (int sectionIndex : seccionesEspecificas) 
+                                {
+                                    JPanel sectionPanel = allSections.get(sectionIndex + 1); // Ajuste de índice
+                                    if (sectionPanel != null && sectionPanel.getParent() != null) {
+                                        seccionesMap.put(sectionIndex, sectionPanel); // Añadir al mapa
                                     }
-
-                                    // Añadir la figura al `labelsPanel` en la sección específica
-                                    labelsPanel.add(figuraPanel);
-                                    labelsPanel.revalidate();
-                                    labelsPanel.repaint();
-
-                                    JPanel labelsPanelLeft = (JPanel) sectionPanel.getComponent(3); // Obtén el primer
-                                                                                                    // componente,
-
-                                    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-                                    executor.schedule(() -> {
-                                        // Código a ejecutar después del delay
-                                        labelsPanel.removeAll();
-                                        labelsPanelLeft.add(figuraPanel);
-                                        labelsPanelLeft.revalidate();
-                                        labelsPanelLeft.repaint();
-                                    }, 2, TimeUnit.SECONDS);
-                                    executor.shutdown();
                                 }
+                                // Obtener un valor aleatorio
+                                JPanel randomValue = getRandomValueFromMap(seccionesMap);
+                                System.out.println("Sección aleatoria: " + randomValue);
+                                                                
+                                // Obtén el `labelsPanel` de esa sección para añadir la figura
+                                        JPanel labelsPanel = (JPanel) randomValue.getComponent(2); // Obtén el primer
+                                                                                                    // componente que debería
+                                                                                                    // ser labelsPanel
+                                                
+                                        //Seleccionar la figura basada en la configuración de la alerta
+                                        JPanel figuraPanel;
+                                        switch (alertaConfig.getForma()) 
+                                        {
+                                            case "Círculo":
+                                                figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
+                                                        new Object[][] { alert });
+                                                if (popupCheckBox.isSelected()) {
+                                                    openPopupWithTable(new Object[][] { alert });
+                                                }
+                                                break;
+                                            case "Cuadrado":
+                                                figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
+                                                        new Object[][] { alert });
+                                                if (popupCheckBox.isSelected()) {
+                                                    openPopupWithTable(new Object[][] { alert });
+                                                }
+
+                                                break;
+                                            case "Triángulo":
+                                                figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
+                                                        new Object[][] { alert });
+                                                if (popupCheckBox.isSelected()) {
+                                                    openPopupWithTable(new Object[][] { alert });
+                                                }
+                                                break;
+                                            default:
+                                                figuraPanel = new JPanel(); // En caso de error o forma no reconocida
+                                                break;
+                                        }
+
+                                        // Añadir la figura al `labelsPanel` en la sección específica
+                                        labelsPanel.add(figuraPanel);
+                                        labelsPanel.revalidate();
+                                        labelsPanel.repaint();
+
+                                        JPanel labelsPanelLeft = (JPanel) randomValue.getComponent(3); // Obtén el primer
+                                                                                                        // componente,
+
+                                        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+                                        executor.schedule(() -> {
+                                            // Código a ejecutar después del delay
+                                            labelsPanel.removeAll();
+                                            labelsPanelLeft.add(figuraPanel);
+                                            labelsPanelLeft.revalidate();
+                                            labelsPanelLeft.repaint();
+                                        }, 2, TimeUnit.SECONDS);
+                                        executor.shutdown();
+
                             }
 
-                    }
+                        }
 
                     // Actualizar el último alertId procesado
                     lastProcessedId = (int) newAlerts.get(newAlerts.size() - 1)[0];
@@ -681,7 +697,7 @@ public class MainSwing
                 } 
                 else 
                 {
-                    addSpecificSectionsFromMap();
+                    addSpecificSectionsFromMap(new int[] {2, 4, 6, 8});
                     sectionsPanel.revalidate();
                     sectionsPanel.repaint();
                     configuracion.setSectionCount("8 secciones");
@@ -715,60 +731,26 @@ public class MainSwing
 private Map<Integer, JPanel> removedSectionsMap = new LinkedHashMap<>();
 
 
-// Método modificado para eliminar y almacenar las secciones en orden y su índice
-private void removeSpecificSections(int[] sectionsToRemove) 
-{
-    List<Component> toRemove = new ArrayList<>();
-    // Recolectar los paneles a eliminar y almacenarlos en el mapa con su índice
-    Component[] components = sectionsPanel.getComponents();
-    for (int i = 0; i < components.length; i++) 
-    {
-        if (components[i] instanceof JPanel) {
-            JPanel panel = (JPanel) components[i];
-            int sectionNumber = Integer.parseInt(panel.getName().substring(8)); // Obtener el número de sección            
-            for (int section : sectionsToRemove) 
-            {
-                if (section == sectionNumber) {
-                    toRemove.add(panel);
-                    // Almacenar la sección eliminada junto con su índice en el LinkedHashMap
-                    removedSectionsMap.put(i, panel);
-                    break;
-                }
-            }
+private void removeSpecificSections(int[] sectionsToRemove) {
+    for (int index : sectionsToRemove) {
+        JPanel sectionPanel = allSections.get(index);
+        if (sectionPanel != null && sectionPanel.getParent() != null) {
+            sectionsPanel.remove(sectionPanel);
         }
     }
-
-    // Eliminar los paneles recolectados del panel principal
-    for (Component comp : toRemove) {
-
-        sectionsPanel.remove(comp);
-    }
-
-    // Actualizar el panel después de la eliminación
     sectionsPanel.revalidate();
     sectionsPanel.repaint();
 }
 
-
-// Método para agregar secciones desde el mapa en la posición original
-private void addSpecificSectionsFromMap() 
-{
-    // Recorre las secciones eliminadas en el mapa en el orden de inserción
-    for (Map.Entry<Integer, JPanel> entry : removedSectionsMap.entrySet()) 
-    {
-        int index = entry.getKey();
-        JPanel panel = entry.getValue();
-
-        // Inserta el panel en su posición original
-        sectionsPanel.add(panel, index);
+private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
+    for (int index : sectionsToAdd) {
+        JPanel sectionPanel = allSections.get(index);
+        if (sectionPanel != null && sectionPanel.getParent() == null) {
+            sectionsPanel.add(sectionPanel);
+        }
     }
-
-    // Actualizar el panel después de añadir las secciones
     sectionsPanel.revalidate();
     sectionsPanel.repaint();
-
-    // Limpiar el mapa después de reinsertar las secciones
-    removedSectionsMap.clear();
 }
 
 
@@ -802,7 +784,8 @@ private void addSpecificSectionsFromMap()
 
         // Añadir un botón para cerrar el diálogo
         JButton closeButton = new JButton("Cerrar");
-        closeButton.addActionListener(new ActionListener() {
+        closeButton.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 tableDialog.dispose();
@@ -845,7 +828,8 @@ private void addSpecificSectionsFromMap()
         selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
         selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
 
-        selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() {
+        selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() 
+        {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Llama al modal del selector de color para las alertas
@@ -937,6 +921,18 @@ private void addSpecificSectionsFromMap()
         colorDialog.setLocationRelativeTo(owner);
         colorDialog.setVisible(true);
     }
+
+        // Implementación del método para obtener un valor aleatorio del mapa
+        public static JPanel getRandomValueFromMap(Map<Integer, JPanel> map) 
+        {
+            Random random = new Random();
+            // Convertimos los valores del mapa a una lista
+            List<JPanel> values = new ArrayList<>(map.values());
+            // Seleccionamos un índice aleatorio
+            int randomIndex = random.nextInt(values.size());
+            // Retornamos el valor en la posición aleatoria
+            return values.get(randomIndex);
+        }
 
     private Color showColorPickerModalForAlerts(JFrame owner) {
         JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
