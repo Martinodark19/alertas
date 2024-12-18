@@ -1,13 +1,15 @@
 package com.example.header;
 
-public class Configuracion {
+public class Configuracion 
+{
     private int updateFrequency; // Frecuencia de actualización en milisegundos
     private boolean showPopup;   // Estado del checkbox para "Mostrar pop-up en pantalla"
     private boolean hideTable;   // Estado del checkbox para "Ocultar tabla"
     private String sectionCount;    // Número de secciones visibles (por ejemplo, 4 u 8)
 
     // Constructor por defecto con valores predeterminados
-    public Configuracion() {
+    public Configuracion() 
+    {
         this.updateFrequency = 2000; // Valor predeterminado de 2000 ms
         this.showPopup = false;      // Valor predeterminado de no mostrar pop-up
         this.hideTable = false;      // Valor predeterminado de no ocultar la tabla

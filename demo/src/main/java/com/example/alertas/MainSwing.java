@@ -7,12 +7,15 @@ import javax.swing.table.DefaultTableModel;
 import com.example.FigurasDivididas;
 import com.example.header.AlertasConfig;
 import com.example.header.Configuracion;
+import com.example.configuracion.ConfigProperties;
+
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MainSwing 
 {
-
     // map para almacenar las secciones
     private Map<Integer, JPanel> allSections = new HashMap<>();
 
@@ -73,10 +75,15 @@ public class MainSwing
     Configuracion configuracion = new Configuracion();
 
     // checkbox del boton de Activado y desactivdo de pop-up
-    JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar", configuracion.isShowPopup()); // Inicializa marcado
-    // checkbox del boton de Activado y desactivdo de visualizar tablas
-    JCheckBox hideTableCheckBox = new JCheckBox("Mostrar/Ocultar", configuracion.isHideTable());
+    //JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar", configuracion.isShowPopup()); // Inicializa marcado
+    String showPopupFromProperties = ConfigProperties.getProperty("app.showPopup").trim().toLowerCase();
+    String hideTableFromProperties = ConfigProperties.getProperty("app.hideTable").trim().toLowerCase();
 
+    JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar", Boolean.parseBoolean(showPopupFromProperties)); // Inicializa marcado
+
+    // checkbox del boton de Activado y desactivdo de visualizar tablas
+    JCheckBox hideTableCheckBox = new JCheckBox("Mostrar/Ocultar", Boolean.parseBoolean(hideTableFromProperties));
+    
     // variable que contendra la frecuencia en ms
     int updateFrequency = configuracion.getUpdateFrequency();
 
@@ -90,6 +97,8 @@ public class MainSwing
 
     public static void main(String[] args) 
     {
+        // Forzar la inicialización de ConfigProperties
+        ConfigProperties.getAllProperties();
         SwingUtilities.invokeLater(MainSwing::new);
     }
 
@@ -359,7 +368,6 @@ public class MainSwing
                             }
                             // Obtener un valor aleatorio
                             JPanel randomValue = getRandomValueFromMap(seccionesMap);
-                            System.out.println("Sección aleatoria: " + randomValue);
 
                             // Obtén el `labelsPanel` de esa sección para añadir la figura
                             JPanel labelsPanel = (JPanel) randomValue.getComponent(2);
@@ -631,77 +639,58 @@ public class MainSwing
         JLabel msLabel = new JLabel("Frecuencia de actualización (ms):");
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
         JFormattedTextField msField = new JFormattedTextField(numberFormat);
-        msField.setText(Integer.toString(configuracion.getUpdateFrequency()));
+        // Cambiar el color del texto a rojo
+        msField.setDisabledTextColor(Color.BLUE);
+        msField.setEnabled(false);
 
+        msField.setText(ConfigProperties.getProperty("app.updateFrequency"));
         // Nueva opción para "Mostrar pop-up en pantalla"
+        
         JLabel popupLabel = new JLabel("Mostrar pop-up en pantalla:");
+        popupCheckBox.setEnabled(false);
+
 
         // Nueva opción para "Mostrar pop-up en pantalla"
         JLabel hideTable = new JLabel("Ocultar tabla:");
         hideTable.setAlignmentX(Component.LEFT_ALIGNMENT);
         hideTableCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        // Deshabilitar para que no sean clickeables
+        hideTableCheckBox.setEnabled(false);
+
+
+
+        // Personalizar el renderer para cambiar el color del texto deshabilitado
+
+        
         // Nueva opción para "Secciones en pantalla"
         JLabel sectionsLabelConfiguration = new JLabel("Secciones en pantalla:");
-        String[] sectionOptions = { "4 secciones", "8 secciones" };
+        String[] sectionOptions = { "4", "8" };
         JComboBox<String> sectionComboBox = new JComboBox<>(sectionOptions);
-        sectionComboBox.setSelectedItem(configuracion.getSectionCount());
 
-        // Botón para guardar los cambios
-        JButton applyButton = new JButton("Guardar");
+        String sectionSelectFromProperties = ConfigProperties.getProperty("app.sections").trim();
 
-        applyButton.addActionListener(new ActionListener() 
+        if (sectionSelectFromProperties.contains("4") || sectionSelectFromProperties.contains("8")) 
         {
-            @Override
-            public void actionPerformed(ActionEvent e) 
-            {
-                // Obtener el valor de milisegundos limpio y aplicar su logica
-                Number value = (Number) msField.getValue();
+            sectionComboBox.setSelectedItem(sectionSelectFromProperties);
+            sectionComboBox.setEnabled(false);
+            UIManager.put("ComboBox.disabledForeground", new Color(0, 0, 255)); // Azul
 
-                if (value != null) 
-                {
-                    updateFrequency = value.intValue();
-                    configuracion.setUpdateFrequency(updateFrequency);
-                    configDialog.dispose(); // Cierra el diálogo después de guardar
+            // Actualizar la apariencia del ComboBox
+            SwingUtilities.updateComponentTreeUI(sectionComboBox);
+        } 
+        else 
+        {
 
-                    // Mostrar un mensaje de éxito
-                    verifySaveMs = true;
-                    JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-                } 
-                else 
-                {
-                    configDialog.dispose(); // Cierra el diálogo después de guardar un valor vacío
-                    JOptionPane.showMessageDialog(owner, "El campo no puede quedar vacío. Por favor, reintente con un número válido.");
-                }
-                // Lógica para ocultar tablas y mostrarlas
-                if (hideTableCheckBox.isSelected()) 
-                {
-                    // Oculta la tabla si el JCheckBox está marcado
-                    configuracion.setHideTable(true);
-                    tablesPanel.setVisible(false);
-                }
-                else 
-                {
-                    tablesPanel.setVisible(true);
-                }
-                if (sectionComboBox.getSelectedItem().equals("4 secciones")) 
-                {
-                    configuracion.setSectionCount("4 secciones");
-                    // Eliminar secciones específicas
-                    removeSpecificSections(new int[] {2,4,6,8});
-                } 
-                else 
-                {
-                    addSpecificSectionsFromMap(new int[] {2, 4, 6, 8});
-                    sectionsPanel.revalidate();
-                    sectionsPanel.repaint();
-                    configuracion.setSectionCount("8 secciones");
-                }
-            }
-        });
-        // logica para almacenar en memoria ocultar tabla
-        configuracion.isHideTable();
-        configuracion.getSectionCount();
+            JOptionPane.showMessageDialog(null, 
+            "La configuración de 'app.sections' contiene un valor no válido: '" + sectionSelectFromProperties + "'.\n" +
+            "Por favor, verifique que el archivo de configuración no contenga espacios adicionales o caracteres incorrectos.\n" +
+            "Se usará el valor por defecto: 4 secciones.", 
+            "Advertencia de Configuración", 
+            JOptionPane.WARNING_MESSAGE);
+
+            sectionComboBox.setSelectedItem("4"); // Valor por defecto
+        }
 
         // Añadir los componentes al panel
         configPanel.add(msLabel); // Etiqueta de frecuencia en milisegundos
@@ -715,7 +704,6 @@ public class MainSwing
 
         // Añadir el panel de configuración al diálogo
         configDialog.add(configPanel, BorderLayout.CENTER);
-        configDialog.add(applyButton, BorderLayout.SOUTH); // Botón en la parte inferior
 
         configDialog.setLocationRelativeTo(owner); // Centrar el diálogo
         configDialog.setVisible(true);
@@ -805,72 +793,138 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
         JPanel configPanel = new JPanel(new GridLayout(5, 2, 10, 10));
         configPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        String alertTypeFromProperties = ConfigProperties.getProperty("alert.type").trim();
+        
         // Tipo de alerta
         JLabel alertTypeLabel = new JLabel("Tipo de Alerta:");
         String[] alertTypes = { "1", "2", "3", "4" };
         JComboBox<String> alertTypeComboBox = new JComboBox<>(alertTypes);
+        alertTypeComboBox.setSelectedItem(alertTypeFromProperties);
+
+        // Verificar si el valor de alertTypeFromProperties está en los valores permitidos
+        if (Arrays.asList(alertTypes).contains(alertTypeFromProperties)) 
+        {
+            alertTypeComboBox.setSelectedItem(alertTypeFromProperties);
+            // Cambiar el color del texto deshabilitado
+            UIManager.put("ComboBox.disabledForeground", new Color(0, 0, 255)); // Azul
+
+            // Actualizar la apariencia del ComboBox
+            SwingUtilities.updateComponentTreeUI(alertTypeComboBox);
+            alertTypeComboBox.setEnabled(false);
+        } 
+        else 
+        {
+            // Mostrar mensaje al usuario
+            JOptionPane.showMessageDialog(null, 
+                "El valor configurado para 'alert.type' es inválido o no permitido: '" + alertTypeFromProperties + "'.\n" +
+                "Por favor, asegúrese de que el valor esté entre los siguientes: " + String.join(", ", alertTypes) + ".\n" +
+                "Se usará el valor por defecto: 1.", 
+                "Advertencia de Configuración", 
+                JOptionPane.WARNING_MESSAGE);
+
+            // Usar un valor por defecto
+            alertTypeComboBox.setSelectedItem("1");
+        }
+
+        String alertSeverityFromProperties = ConfigProperties.getProperty("alert.severity").trim().toLowerCase();
+
+        // Convertir la primera letra a mayúscula
+        if (!alertSeverityFromProperties.isEmpty()) 
+        {
+            alertSeverityFromProperties = alertSeverityFromProperties.substring(0, 1).toUpperCase() 
+            + alertSeverityFromProperties.substring(1).toLowerCase();
+        }
 
         // Severidad
         JLabel severityLabel = new JLabel("Severidad:");
         String[] severities = { "Alta", "Media", "Baja" };
+        
         JComboBox<String> severityComboBox = new JComboBox<>(severities);
+            
+        if (Arrays.asList(severities).contains(alertSeverityFromProperties)) 
+        {
+            severityComboBox.setSelectedItem(alertSeverityFromProperties);
+            severityComboBox.setEnabled(false);
+        } 
+        else 
+        {
+            // Mostrar mensaje al usuario si el valor no es válido
+            JOptionPane.showMessageDialog(null,
+                "El valor configurado para 'alert.severity' es inválido o no permitido: '" + alertSeverityFromProperties + "'.\n" +
+                "Por favor, asegúrese de que el valor esté entre los siguientes: " + String.join(", ", severities) + ".\n" +
+                "Se usará el valor predeterminado: Media.",
+                "Advertencia de Configuración",
+                JOptionPane.WARNING_MESSAGE);
+        
+            // Usar un valor por defecto si el valor de la propiedad no es válido
+            severityComboBox.setSelectedItem("Media");
+        }
+
+        String alertShapeFromProperties = ConfigProperties.getProperty("alert.shape").trim().toLowerCase();
+
+        // Convertir la primera letra a mayúscula
+        if (!alertShapeFromProperties.isEmpty()) 
+        {
+            alertShapeFromProperties = alertShapeFromProperties.substring(0, 1).toUpperCase() 
+            + alertShapeFromProperties.substring(1).toLowerCase();
+        }
 
         // Forma
         JLabel shapeLabel = new JLabel("Forma:");
-        String[] shapes = { "Círculo", "Triángulo", "Cuadrado" };
+        String[] shapes = { "Circulo", "Triangulo", "Cuadrado" };
         JComboBox<String> shapeComboBox = new JComboBox<>(shapes);
+
+        // Validar si el valor de 'alert.shape' está entre las opciones válidas
+        if (Arrays.asList(shapes).contains(alertShapeFromProperties)) 
+        {
+            shapeComboBox.setSelectedItem(alertShapeFromProperties);
+            shapeComboBox.setEnabled(false);
+
+        } 
+        else 
+        {
+            // Mostrar mensaje al usuario si el valor no es válido
+            JOptionPane.showMessageDialog(null,
+                "El valor configurado para 'alert.shape' es inválido o no permitido: '" + alertShapeFromProperties + "'.\n" +
+                "Por favor, asegúrese de que el valor esté entre los siguientes: " + String.join(", ", shapes) + ".\n" +
+                "Se usará el valor predeterminado: Círculo.",
+                "Advertencia de Configuración",
+                JOptionPane.WARNING_MESSAGE);
+
+            // Usar un valor por defecto si el valor de la propiedad no es válido
+            shapeComboBox.setSelectedItem("Circulo");
+        }
 
         // Color
         JLabel colorLabel = new JLabel("Color:");
         selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
         selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
 
-        selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() 
+        // Obtén el valor del color desde las propiedades
+        String colorFromProperties = ConfigProperties.getProperty("alert.color").trim(); // Valor predeterminado: #CCCCCC
+        colorFromProperties = colorFromProperties.replaceAll("\\s+", ""); // Elimina espacios en caso de que existan
+
+        try 
         {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Llama al modal del selector de color para las alertas
-                Color selectedColor = showColorPickerModalForAlerts(owner);
-
-                // Si se selecciona un color (no se cierra el modal sin elegir)
-                if (selectedColor != null) {
-                    // Cambiar el color de fondo del botón al color seleccionado
-                    selectedColorButtonForAlertConfigColor.setBackground(selectedColor);
-
-                    // Opcional: si quieres guardar este color en alguna variable de configuración
-                    alertaConfig.setColor(selectedColor);
-                }
-            }
-        });
-
-        // Botón para guardar
-        JButton saveButton = new JButton("Guardar");
-
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String tipoAlerta = (String) alertTypeComboBox.getSelectedItem();
-                String severidad = (String) severityComboBox.getSelectedItem();
-                String forma = (String) shapeComboBox.getSelectedItem();
-                Color color = selectedColorButtonForAlertConfigColor.getBackground();
-
-                alertaConfig.setTipoAlerta(tipoAlerta); // Establecer el tipo de alerta
-                alertaConfig.setSeveridad(severidad); // Establecer la severidad
-                alertaConfig.setForma(forma); // Establecer la forma
-                alertaConfig.setColor(color); // Establecer el color
-
-            
-                alertDialog.dispose(); // Cierra el diálogo después de guardar
-
-                // Mostrar un mensaje de éxito
-                JOptionPane.showMessageDialog(owner, "Configuración guardada con éxito.");
-            }
-        });
-
-        alertTypeComboBox.setSelectedItem(alertaConfig.getTipoAlerta());
-        severityComboBox.setSelectedItem(alertaConfig.getSeveridad());
-        shapeComboBox.setSelectedItem(alertaConfig.getForma());
-        selectedColorButtonForAlertConfigColor.setBackground(alertaConfig.getColor());
+            // Intenta establecer el color del botón
+            Color parsedColor = Color.decode(colorFromProperties);
+            selectedColorButtonForAlertConfigColor.setBackground(parsedColor);
+            selectedColorButtonForAlertConfigColor.setEnabled(false);
+        } 
+        catch (NumberFormatException e) 
+        {
+            // Si el color no es válido, muestra un mensaje de advertencia al usuario y usa un valor por defecto
+            JOptionPane.showMessageDialog(
+                null,
+                "El valor configurado para 'alert.color' es inválido o no es un color soportado: '" + colorFromProperties + "'.\n" +
+                "Por favor, asegúrese de que sea un código hexadecimal válido (ejemplo: #FF0000).\n" +
+                "Se usará el valor por defecto: #CCCCCC.",
+                "Advertencia de Configuración",
+                JOptionPane.WARNING_MESSAGE
+            );
+            // Configura un color por defecto
+            selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
+        }
 
         // Agregar componentes al panel de configuración
         configPanel.add(alertTypeLabel);
@@ -883,7 +937,6 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
         configPanel.add(selectedColorButtonForAlertConfigColor);
 
         alertDialog.add(configPanel, BorderLayout.CENTER);
-        alertDialog.add(saveButton, BorderLayout.SOUTH);
         alertDialog.setLocationRelativeTo(owner);
         alertDialog.setVisible(true);
     }

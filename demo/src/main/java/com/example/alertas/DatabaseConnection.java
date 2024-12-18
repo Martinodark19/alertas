@@ -8,9 +8,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.configuracion.ConfigProperties;
+
 public class DatabaseConnection 
 {
-    private static final String DB_URL = "jdbc:sqlserver://localhost:1433;databaseName=alertas_db;integratedSecurity=true;encrypt=false;";
+    private static final String DB_URL_FROM_PROPERTIES = ConfigProperties.getProperty("db.url");
+
+    private static final String DB_URL = DB_URL_FROM_PROPERTIES + ";integratedSecurity=true;encrypt=false;";
+    
 
     public static List<Object[]> fetchAlertsAfterId(int lastId) 
     {
