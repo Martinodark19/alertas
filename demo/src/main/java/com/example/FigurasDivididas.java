@@ -4,18 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+
 
 public class FigurasDivididas 
 {
-
     public static class CirculoPanel extends JPanel 
     {
         private Color color;
         private Object[][] data;
         private int borderWidth = 2; // Grosor del borde
-
 
         public CirculoPanel(Color color, Object[][] data) 
         {
@@ -48,10 +49,32 @@ public class FigurasDivididas
             g2d.drawOval(borderWidth / 2, borderWidth / 2, diameter, diameter); // Dibuja el borde del círculo
         }
 
-        private void openDetailWindow() {
+        private void openDetailWindow() 
+        {
+
+            List<String> listaAlertData = new ArrayList<>();
+
+            for (Object[] row : data) 
+            {
+                // Recorrer columnas
+                for (Object elem : row) 
+                {
+                    // Verificar que el elemento no sea null antes de convertirlo a String
+                    if (elem != null) 
+                    {
+                        listaAlertData.add(elem.toString()); // Convertir a String de forma segura
+                    } 
+                    else 
+                    {
+                        listaAlertData.add(""); // Añadir una cadena vacía si el valor es null
+                    }
+                }
+            }
+
             JFrame detailFrame = new JFrame("Detalle del Círculo");
             detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             detailFrame.setLayout(new BorderLayout());
+            detailFrame.setSize(800, 600);
 
             String[] columnNames = 
             {
@@ -62,10 +85,25 @@ public class FigurasDivididas
                 "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
             };
 
-            JTable table = new JTable(data, columnNames);
-            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            JScrollPane scrollPane = new JScrollPane(table);
+            JPanel formPanel = new JPanel();
+            formPanel.setLayout(new GridLayout(columnNames.length, 2, 10, 10)); // Dos columnas: etiqueta y campo de texto
+            formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+            // Crear un JTextField para cada campo
+            JTextField[] textFields = new JTextField[columnNames.length];
+
+            for (int i = 0; i < columnNames.length; i++) 
+            {
+                JLabel label = new JLabel(columnNames[i] + ":");
+                JTextField textField = new JTextField();
+                textFields[i] = textField; // Guardar referencia al JTextField
+                textFields[i].setText(listaAlertData.get(i));
+
+                formPanel.add(label);
+                formPanel.add(textField);
+            }
+                        
+            
             // Botón de Cerrar
             JButton closeButton = new JButton("Cerrar Ventana");
             closeButton.addActionListener(new ActionListener() 
@@ -76,13 +114,15 @@ public class FigurasDivididas
                 }
             });
 
-            // Agregar componentes a la ventana
-            detailFrame.add(scrollPane, BorderLayout.CENTER);
-            detailFrame.add(closeButton, BorderLayout.SOUTH);
 
-            // Ajustar el tamaño de la ventana al contenido
-            detailFrame.pack();
-            detailFrame.setLocationRelativeTo(null);  // Centrar la ventana
+
+
+            // Añadir el formulario y el botón al frame
+            detailFrame.setLayout(new BorderLayout());
+            detailFrame.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+
+            // Mostrar el frame
+            detailFrame.setLocationRelativeTo(null);
             detailFrame.setVisible(true);
         }
     }
@@ -122,12 +162,34 @@ public class FigurasDivididas
             g2d.drawRect(borderWidth / 2, borderWidth / 2, size, size); // Dibuja el borde del cuadrado
         }
 
-        private void openDetailWindow() {
+        private void openDetailWindow() 
+        {
+            List<String> listaAlertData = new ArrayList<>();
+
+            for (Object[] row : data) 
+            {
+                // Recorrer columnas
+                for (Object elem : row) 
+                {
+                    // Verificar que el elemento no sea null antes de convertirlo a String
+                    if (elem != null) 
+                    {
+                        listaAlertData.add(elem.toString()); // Convertir a String de forma segura
+                    } 
+                    else 
+                    {
+                        listaAlertData.add(""); // Añadir una cadena vacía si el valor es null
+                    }
+                }
+            }
+
             JFrame detailFrame = new JFrame("Detalle del Cuadrado");
             detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             detailFrame.setLayout(new BorderLayout());
+            detailFrame.setSize(800, 600);
 
-            String[] columnNames = {
+            String[] columnNames = 
+            {
                 "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
                 "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio", 
                 "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
@@ -135,9 +197,28 @@ public class FigurasDivididas
                 "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
             };
 
-            JTable table = new JTable(data, columnNames);
-            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            JScrollPane scrollPane = new JScrollPane(table);
+
+            JPanel formPanel = new JPanel();
+            formPanel.setLayout(new GridLayout(columnNames.length, 2, 10, 10)); // Dos columnas: etiqueta y campo de texto
+            formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+
+
+
+                    // Crear un JTextField para cada campo
+            JTextField[] textFields = new JTextField[columnNames.length];
+
+            for (int i = 0; i < columnNames.length; i++) 
+            {
+                JLabel label = new JLabel(columnNames[i] + ":");
+                JTextField textField = new JTextField();
+                textFields[i] = textField; // Guardar referencia al JTextField
+                textFields[i].setText(listaAlertData.get(i));
+
+                formPanel.add(label);
+                formPanel.add(textField);
+            }
+
 
             // Botón de Cerrar
             JButton closeButton = new JButton("Cerrar Ventana");
@@ -148,13 +229,12 @@ public class FigurasDivididas
                 }
             });
 
-            // Agregar componentes a la ventana
-            detailFrame.add(scrollPane, BorderLayout.CENTER);
-            detailFrame.add(closeButton, BorderLayout.SOUTH);
+            // Añadir el formulario y el botón al frame
+            detailFrame.setLayout(new BorderLayout());
+            detailFrame.add(new JScrollPane(formPanel), BorderLayout.CENTER);
 
-            // Ajustar el tamaño de la ventana al contenido
-            detailFrame.pack();
-            detailFrame.setLocationRelativeTo(null);  // Centrar la ventana
+            // Mostrar el frame
+            detailFrame.setLocationRelativeTo(null);
             detailFrame.setVisible(true);
         }
     }
@@ -199,9 +279,31 @@ public class FigurasDivididas
 
         private void openDetailWindow() 
         {
+
+            List<String> listaAlertData = new ArrayList<>();
+
+            for (Object[] row : data) 
+            {
+                // Recorrer columnas
+                for (Object elem : row) 
+                {
+                    // Verificar que el elemento no sea null antes de convertirlo a String
+                    if (elem != null) 
+                    {
+                        listaAlertData.add(elem.toString()); // Convertir a String de forma segura
+                    } 
+                    else 
+                    {
+                        listaAlertData.add(""); // Añadir una cadena vacía si el valor es null
+                    }
+                }
+            }
+
             JFrame detailFrame = new JFrame("Detalle del Triángulo");
             detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             detailFrame.setLayout(new BorderLayout());
+            detailFrame.setLayout(new BorderLayout());
+            detailFrame.setSize(800, 600);
 
             String[] columnNames = 
             {
@@ -212,9 +314,28 @@ public class FigurasDivididas
                 "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
             };
 
-            JTable table = new JTable(data, columnNames);
-            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-            JScrollPane scrollPane = new JScrollPane(table);
+
+            JPanel formPanel = new JPanel();
+            formPanel.setLayout(new GridLayout(columnNames.length, 2, 10, 10)); // Dos columnas: etiqueta y campo de texto
+            formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            
+
+
+
+
+            // Crear un JTextField para cada campo
+            JTextField[] textFields = new JTextField[columnNames.length];
+
+            for (int i = 0; i < columnNames.length; i++) 
+            {
+                JLabel label = new JLabel(columnNames[i] + ":");
+                JTextField textField = new JTextField();
+                textFields[i] = textField; // Guardar referencia al JTextField
+                textFields[i].setText(listaAlertData.get(i));
+
+                formPanel.add(label);
+                formPanel.add(textField);
+            }
 
             // Botón de Cerrar
             JButton closeButton = new JButton("Cerrar Ventana");
@@ -225,13 +346,12 @@ public class FigurasDivididas
                 }
             });
 
-            // Agregar componentes a la ventana
-            detailFrame.add(scrollPane, BorderLayout.CENTER);
-            detailFrame.add(closeButton, BorderLayout.SOUTH);
+            // Añadir el formulario y el botón al frame
+            detailFrame.setLayout(new BorderLayout());
+            detailFrame.add(new JScrollPane(formPanel), BorderLayout.CENTER);
 
-            // Ajustar el tamaño de la ventana al contenido
-            detailFrame.pack();
-            detailFrame.setLocationRelativeTo(null);  // Centrar la ventana
+            // Mostrar el frame
+            detailFrame.setLocationRelativeTo(null);
             detailFrame.setVisible(true);
         }
     }

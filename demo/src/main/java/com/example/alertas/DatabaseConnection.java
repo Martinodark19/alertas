@@ -16,6 +16,11 @@ public class DatabaseConnection
 
     private static final String DB_URL = DB_URL_FROM_PROPERTIES + ";integratedSecurity=true;encrypt=false;";
     
+    // Getter para DB_URL
+    public static String getDbUrl() 
+    {
+        return DB_URL;
+    }
 
     public static List<Object[]> fetchAlertsAfterId(int lastId) 
     {

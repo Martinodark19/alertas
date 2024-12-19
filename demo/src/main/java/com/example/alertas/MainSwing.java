@@ -1,18 +1,20 @@
 package com.example.alertas;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-
-import com.example.FigurasDivididas;
-import com.example.header.AlertasConfig;
-import com.example.header.Configuracion;
-import com.example.configuracion.ConfigProperties;
-
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +26,31 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import com.example.FigurasDivididas;
+import com.example.configuracion.ConfigProperties;
 
 public class MainSwing 
 {
@@ -57,6 +84,7 @@ public class MainSwing
 
     // timer para la actualizacion de la tabla basada en los MS
     private Timer timer;
+    
 
     private JFrame frame;
 
@@ -67,12 +95,6 @@ public class MainSwing
     private Integer timeForTimmerUpdated;
 
     private DatabaseConnection databaseConnection;
-
-    // instancia para almacenar configurar alerta del header
-    AlertasConfig alertaConfig = new AlertasConfig();
-
-    // instancia para almacenar configuracion del header
-    Configuracion configuracion = new Configuracion();
 
     // checkbox del boton de Activado y desactivdo de pop-up
     //JCheckBox popupCheckBox = new JCheckBox("Mostrar/Ocultar", configuracion.isShowPopup()); // Inicializa marcado
@@ -85,32 +107,54 @@ public class MainSwing
     JCheckBox hideTableCheckBox = new JCheckBox("Mostrar/Ocultar", Boolean.parseBoolean(hideTableFromProperties));
     
     // variable que contendra la frecuencia en ms
-    int updateFrequency = configuracion.getUpdateFrequency();
+    Integer updateFrequency = Integer.parseInt(ConfigProperties.getProperty("app.updateFrequency").trim());
 
     // instancia de las figuras
     FigurasDivididas figurasDivididas = new FigurasDivididas();
 
-    public MainSwing(DatabaseConnection databaseConnection) 
-    {
-        this.databaseConnection = databaseConnection;
-    }
 
     public static void main(String[] args) 
     {
         // Forzar la inicialización de ConfigProperties
         ConfigProperties.getAllProperties();
-        SwingUtilities.invokeLater(MainSwing::new);
+        SwingUtilities.invokeLater(() -> new MainSwing(new DatabaseConnection()));
+
+
     }
 
-    // Método para configurar y dibujar la figura según la configuración de la
-    // alerta
-
-    public MainSwing() 
+    public MainSwing(DatabaseConnection databaseConnection) 
     {
+
+        this.databaseConnection = databaseConnection;
 
         JFrame frame = new JFrame("Mi App");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
+
+        try 
+        {
+            String dbUrl = DatabaseConnection.getDbUrl();
+            Connection connection = DriverManager.getConnection(dbUrl); // Intenta conectar
+            System.out.println("Conexión a la base de datos exitosa."); // Mensaje opcional
+            connection.close(); // Cierra la conexión si fue exitosa
+        } 
+        catch (Exception e) 
+        {
+            // Captura cualquier excepción relacionada con la conexión
+            e.printStackTrace(); // Para depuración, imprime el stack trace en la consola
+    
+            // Muestra un mensaje de error al usuario
+            JOptionPane.showMessageDialog(
+                frame,
+                "No se pudo establecer conexión con la base de datos. El programa se cerrará.",
+                "Error de Conexión",
+                JOptionPane.ERROR_MESSAGE
+            );
+    
+            // Cierra el programa con un código de error
+            System.exit(0);
+        }
+
 
         // Crear el panel principal
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -135,7 +179,6 @@ public class MainSwing
         JPanel contentPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-
 
 
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
@@ -191,7 +234,7 @@ public class MainSwing
                 public void actionPerformed(ActionEvent e) 
                 {
                     selectedSection = sectionPanel;
-                    showColorPickerModal(frame);
+                    //showColorPickerModal(frame);
                 }
             });
 
@@ -239,6 +282,27 @@ public class MainSwing
             allSections.put(i, sectionPanel);
         }
 
+        String verificarIniciadoSecciones = ConfigProperties.getProperty("app.sections").trim();
+
+        if (!verificarIniciadoSecciones.equals("8")  && !verificarIniciadoSecciones.equals("4")) 
+        {
+            JOptionPane.showMessageDialog(
+                frame, 
+                "El valor configurado para 'app.sections' es inválido: '" + verificarIniciadoSecciones + "'.\n" +
+                "Por favor, asegúrese de que el valor en el archivo de configuración sea '4' o '8'.\n" +
+                "Se usará el valor por defecto: 4 secciones.", 
+                "Error en Configuración", 
+                JOptionPane.ERROR_MESSAGE
+            );
+        
+            // Asignar un valor por defecto si es necesario
+            verificarIniciadoSecciones = "4";
+        }
+
+        if (verificarIniciadoSecciones.equals("4")) 
+        {
+            removeSpecificSections(new int[] {2,4,6,8});
+        }
 
         // Actualizar el panel para mostrar la nueva configuración
         sectionsPanel.revalidate();
@@ -296,19 +360,21 @@ public class MainSwing
         // Llenar la tabla con los valores iniciales
         alertTableModel.addRow(lastAlert);
 
-        timeForTimmerUpdated = configuracion.getUpdateFrequency();
+        timeForTimmerUpdated = Integer.parseInt(ConfigProperties.getProperty("app.updateFrequency").trim());
 
         // Crear un nuevo Timer con la nueva frecuencia
         Timer timerForUpdateConfigMs = new Timer(1000, new ActionListener() 
         {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e) 
+            {
                 timer.start();
 
                 if (verifySaveMs == true) {
                     timeForTimmerUpdated = updateFrequency;
 
-                    if (timer.isRunning() == true) {
+                    if (timer.isRunning() == true) 
+                    {
                         timer.stop();
                         timer.setDelay(timeForTimmerUpdated);
                         timer.start();
@@ -374,27 +440,36 @@ public class MainSwing
                                                                                                                                               
                             // Seleccionar la figura basada en la configuración de la alerta
                             JPanel figuraPanel;
-                            switch (alertaConfig.getForma()) 
+
+                            //obtener el color de la configuracion
+                            String alertColorFromProperties = ConfigProperties.getProperty("alert.color").trim();
+                            Color alertColor = Color.decode(alertColorFromProperties); // Convierte el valor hexadecimal a un objeto Color
+
+
+                            switch (ConfigProperties.getProperty("alert.shape").toLowerCase()) 
                             {
-                                case "Círculo":
-                                    figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
+                                case "circulo":
+                                    figuraPanel = new FigurasDivididas.CirculoPanel((alertColor),
                                             new Object[][] { alert });
-                                    if (popupCheckBox.isSelected()) {
+                                    if (popupCheckBox.isSelected()) 
+                                    {
                                         openPopupWithTable(new Object[][] { alert });
                                     }
                                     break;
-                                case "Cuadrado":
-                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
+                                case "cuadrado":
+                                    figuraPanel = new FigurasDivididas.CuadradoPanel(alertColor,
                                             new Object[][] { alert });
-                                    if (popupCheckBox.isSelected()) {
+                                    if (popupCheckBox.isSelected()) 
+                                    {
                                         openPopupWithTable(new Object[][] { alert });
                                     }
 
                                     break;
-                                case "Triángulo":
-                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
+                                case "triangulo":
+                                    figuraPanel = new FigurasDivididas.TrianguloPanel(alertColor,
                                             new Object[][] { alert });
-                                    if (popupCheckBox.isSelected()) {
+                                    if (popupCheckBox.isSelected()) 
+                                    {
                                         openPopupWithTable(new Object[][] { alert });
                                     }
                                     break;
@@ -462,31 +537,35 @@ public class MainSwing
                                 JPanel randomValue = getRandomValueFromMap(seccionesMap);
                                                                 
                                 // Obtén el `labelsPanel` de esa sección para añadir la figura
-                                JPanel labelsPanel = (JPanel) randomValue.getComponent(2); // Obtén el primer
-                                                                                                    // componente que debería
-                                                                                                    // ser labelsPanel
+                                JPanel labelsPanel = (JPanel) randomValue.getComponent(2); 
+
                                                 
+                                                            //obtener el color de la configuracion
+                                String alertColorFromProperties = ConfigProperties.getProperty("alert.color").trim();
+                                Color alertColor = Color.decode(alertColorFromProperties); // Convierte el valor hexadecimal a un objeto Color
+
+
                                 //Seleccionar la figura basada en la configuración de la alerta
                                 JPanel figuraPanel;
-                                        switch (alertaConfig.getForma()) 
+                                        switch (ConfigProperties.getProperty("alert.type").trim().toLowerCase()) 
                                         {
-                                            case "Círculo":
-                                                figuraPanel = new FigurasDivididas.CirculoPanel(alertaConfig.getColor(),
+                                            case "circulo":
+                                                figuraPanel = new FigurasDivididas.CirculoPanel(alertColor,
                                                         new Object[][] { alert });
                                                 if (popupCheckBox.isSelected()) {
                                                     openPopupWithTable(new Object[][] { alert });
                                                 }
                                                 break;
-                                            case "Cuadrado":
-                                                figuraPanel = new FigurasDivididas.CuadradoPanel(alertaConfig.getColor(),
+                                            case "cuadrado":
+                                                figuraPanel = new FigurasDivididas.CuadradoPanel(alertColor,
                                                         new Object[][] { alert });
                                                 if (popupCheckBox.isSelected()) {
                                                     openPopupWithTable(new Object[][] { alert });
                                                 }
 
                                                 break;
-                                            case "Triángulo":
-                                                figuraPanel = new FigurasDivididas.TrianguloPanel(alertaConfig.getColor(),
+                                            case "triangulo":
+                                                figuraPanel = new FigurasDivididas.TrianguloPanel(alertColor,
                                                         new Object[][] { alert });
                                                 if (popupCheckBox.isSelected()) {
                                                     openPopupWithTable(new Object[][] { alert });
@@ -530,10 +609,8 @@ public class MainSwing
             }
         });
 
-        // Habilitar el scroll horizontal
         alertScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         alertTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
         // Fijar el tamaño inicial de las columnas que se mostrarán al principio
         alertTable.getColumnModel().getColumn(0).setPreferredWidth(50); // ID
         alertTable.getColumnModel().getColumn(1).setPreferredWidth(150); // Tipo de Ventana
@@ -621,6 +698,19 @@ public class MainSwing
                 showConfigDialog(frame);
             }
         });
+
+
+        // Lógica para ocultar tablas y mostrarlas
+        if (hideTableCheckBox.isSelected()) 
+        {
+            // Oculta la tabla si el JCheckBox está marcado
+            tablesPanel.setVisible(false);
+        }
+        else 
+        {
+            tablesPanel.setVisible(true);
+        }
+
     }
 
     // Método para mostrar el diálogo de configuración de milisegundos y opción de
@@ -643,12 +733,11 @@ public class MainSwing
         msField.setDisabledTextColor(Color.BLUE);
         msField.setEnabled(false);
 
-        msField.setText(ConfigProperties.getProperty("app.updateFrequency"));
+        msField.setText(ConfigProperties.getProperty("app.updateFrequency").trim());
         // Nueva opción para "Mostrar pop-up en pantalla"
         
         JLabel popupLabel = new JLabel("Mostrar pop-up en pantalla:");
         popupCheckBox.setEnabled(false);
-
 
         // Nueva opción para "Mostrar pop-up en pantalla"
         JLabel hideTable = new JLabel("Ocultar tabla:");
@@ -659,25 +748,31 @@ public class MainSwing
         hideTableCheckBox.setEnabled(false);
 
 
-
-        // Personalizar el renderer para cambiar el color del texto deshabilitado
-
-        
         // Nueva opción para "Secciones en pantalla"
         JLabel sectionsLabelConfiguration = new JLabel("Secciones en pantalla:");
         String[] sectionOptions = { "4", "8" };
         JComboBox<String> sectionComboBox = new JComboBox<>(sectionOptions);
+        
 
         String sectionSelectFromProperties = ConfigProperties.getProperty("app.sections").trim();
 
-        if (sectionSelectFromProperties.contains("4") || sectionSelectFromProperties.contains("8")) 
+        if (sectionSelectFromProperties.contains("4")) 
         {
             sectionComboBox.setSelectedItem(sectionSelectFromProperties);
+            //removeSpecificSections(new int[] {2,4,6,8});
+
             sectionComboBox.setEnabled(false);
             UIManager.put("ComboBox.disabledForeground", new Color(0, 0, 255)); // Azul
 
             // Actualizar la apariencia del ComboBox
             SwingUtilities.updateComponentTreeUI(sectionComboBox);
+        }
+        else if (sectionSelectFromProperties.contains("8")) 
+        {
+            sectionComboBox.setSelectedItem(sectionSelectFromProperties);
+            addSpecificSectionsFromMap(new int[] {2, 4, 6, 8});
+            sectionsPanel.revalidate();
+            sectionsPanel.repaint();
         } 
         else 
         {
@@ -725,7 +820,8 @@ private void removeSpecificSections(int[] sectionsToRemove) {
     sectionsPanel.repaint();
 }
 
-private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
+private void addSpecificSectionsFromMap(int[] sectionsToAdd) 
+{
     for (int index : sectionsToAdd) {
         JPanel sectionPanel = allSections.get(index);
         if (sectionPanel != null && sectionPanel.getParent() == null) {
@@ -738,16 +834,37 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
 }
 
 
-
     private void openPopupWithTable(Object[][] alertData) 
     {
+        List<String> listaAlertData = new ArrayList<>();
+
+        // Recorrer filas
+        for (Object[] row : alertData) 
+        {
+            // Recorrer columnas
+            for (Object elem : row) 
+            {
+                // Verificar que el elemento no sea null antes de convertirlo a String
+                if (elem != null) 
+                {
+                    listaAlertData.add(elem.toString()); // Convertir a String de forma segura
+                } 
+                else 
+                {
+                    listaAlertData.add(""); // Añadir una cadena vacía si el valor es null
+                }
+            }
+        }
+
         JDialog tableDialog = new JDialog((Frame) null, "Detalles de la Alerta", true); // No se pasa el owner
-        tableDialog.setSize(600, 400); // Tamaño de la ventana emergente
+        tableDialog.setSize(800, 600); // Tamaño de la ventana emergente
         tableDialog.setLayout(new BorderLayout());
+
 
         // Columnas para la tabla (deberían coincidir con los datos pasados en
         // alertData)
-        String[] columnNames = {
+        String[] columnNames = 
+        {
                 "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
                 "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio",
                 "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
@@ -755,17 +872,26 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
                 "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
         };
 
-        // Crear la tabla con los datos y columnas
-        JTable table = new JTable(alertData, columnNames);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Desactiva el ajuste automático del tamaño de columnas
-        JScrollPane scrollPane = new JScrollPane(table);
 
-        // Configurar scroll para la tabla
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        // Panel principal para el formulario
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new GridLayout(columnNames.length, 2, 10, 10)); // Dos columnas: etiqueta y campo de texto
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Añadir la tabla con el JScrollPane al diálogo
-        tableDialog.add(scrollPane, BorderLayout.CENTER);
+
+        // Crear un JTextField para cada campo
+        JTextField[] textFields = new JTextField[columnNames.length];
+
+        for (int i = 0; i < columnNames.length; i++) 
+        {
+            JLabel label = new JLabel(columnNames[i] + ":");
+            JTextField textField = new JTextField();
+            textFields[i] = textField; // Guardar referencia al JTextField
+            textFields[i].setText(listaAlertData.get(i));
+
+            formPanel.add(label);
+            formPanel.add(textField);
+        }
 
         // Añadir un botón para cerrar el diálogo
         JButton closeButton = new JButton("Cerrar");
@@ -776,15 +902,19 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
                 tableDialog.dispose();
             }
         });
-        tableDialog.add(closeButton, BorderLayout.SOUTH);
 
-        // Mostrar el diálogo
-        tableDialog.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+        // Añadir el formulario y el botón al frame
+        tableDialog.setLayout(new BorderLayout());
+        tableDialog.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+
+        // Mostrar el frame
+        tableDialog.setLocationRelativeTo(null);
         tableDialog.setVisible(true);
     }
 
     // Método para mostrar el diálogo de configuración de alerta
-    private void showAlertConfigDialog(JFrame owner) {
+    private void showAlertConfigDialog(JFrame owner) 
+    {
         JDialog alertDialog = new JDialog(owner, "Configurar Alerta", true);
         alertDialog.setSize(400, 300);
         alertDialog.setLayout(new BorderLayout());
@@ -879,7 +1009,6 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
         {
             shapeComboBox.setSelectedItem(alertShapeFromProperties);
             shapeComboBox.setEnabled(false);
-
         } 
         else 
         {
@@ -897,7 +1026,7 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
 
         // Color
         JLabel colorLabel = new JLabel("Color:");
-        selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
+        selectedColorButtonForAlertConfigColor = new JButton("");
         selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
 
         // Obtén el valor del color desde las propiedades
@@ -941,36 +1070,8 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
         alertDialog.setVisible(true);
     }
 
-    // Método para mostrar el modal del selector de color
-    private void showColorPickerModal(JFrame owner) {
-        JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
-        colorDialog.setSize(600, 400);
-        colorDialog.setLayout(new BorderLayout());
 
-        JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
-        colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
-                "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
-
-        for (String color : colors) 
-        {
-            JButton colorButton = createColorButton(color);
-            colorButtonsPanel.add(colorButton);
-        }
-
-        JButton closeButton = new JButton("Cerrar");
-        closeButton.addActionListener(e -> colorDialog.dispose());
-
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(closeButton);
-
-        colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
-        colorDialog.add(bottomPanel, BorderLayout.SOUTH);
-
-        colorDialog.setLocationRelativeTo(owner);
-        colorDialog.setVisible(true);
-    }
 
         // Implementación del método para obtener un valor aleatorio del mapa
         public static JPanel getRandomValueFromMap(Map<Integer, JPanel> map) 
@@ -984,49 +1085,6 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
             return values.get(randomIndex);
         }
 
-    private Color showColorPickerModalForAlerts(JFrame owner) {
-        JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
-        colorDialog.setSize(600, 400);
-        colorDialog.setLayout(new BorderLayout());
-
-        JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
-        colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
-                "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
-
-        final Color[] selectedColor = { null }; // Array para almacenar el color seleccionado
-
-        for (String color : colors) 
-        {
-            JButton colorButton = new JButton();
-            colorButton.setBackground(Color.decode(color));
-            colorButton.setPreferredSize(new Dimension(50, 50));
-
-            // Evento al hacer clic en un color
-            colorButton.addActionListener(e -> {
-                selectedColor[0] = Color.decode(color); // Almacenar el color seleccionado
-                colorDialog.dispose(); // Cerrar el modal una vez seleccionado
-            });
-
-            colorButtonsPanel.add(colorButton);
-        }
-
-        // Botón de cerrar sin seleccionar un color
-        JButton closeButton = new JButton("Cerrar");
-        closeButton.addActionListener(e -> colorDialog.dispose());
-
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(closeButton);
-
-        colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
-        colorDialog.add(bottomPanel, BorderLayout.SOUTH);
-
-        colorDialog.setLocationRelativeTo(owner);
-        colorDialog.setVisible(true);
-
-        return selectedColor[0]; // Devolver el color seleccionado
-    }
 
     // Método para mostrar el modal de cambio de título
     private void showTitleChangeModal(JFrame owner) 
@@ -1070,5 +1128,8 @@ private void addSpecificSectionsFromMap(int[] sectionsToAdd) {
         });
         return button;
     }
+
+
+    
 
 }
