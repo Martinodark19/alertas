@@ -1,4 +1,4 @@
-package com.example.configuracion;
+package com.example.alertas.configuracion;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +33,23 @@ public class ConfigProperties
         return properties.getProperty(key);
     }
 
+    // Método para establecer o actualizar un valor
+    public static void setProperty(String key, String value) 
+    {
+        properties.setProperty(key, value);
+    }
+
+    /* 
+    public static void saveProperties() {
+        try (OutputStream output = new FileOutputStream(CONFIG_FILE)) 
+        {
+            properties.store(output, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    */
+    
     // Opcional: Método para obtener todas las propiedades
     public static Properties getAllProperties() 
     {

@@ -1,4 +1,4 @@
-package com.example;
+package com.example.alertas.figuras;
 
 import javax.swing.*;
 import java.awt.*;
@@ -76,13 +76,19 @@ public class FigurasDivididas
             detailFrame.setLayout(new BorderLayout());
             detailFrame.setSize(800, 600);
 
+
+            
             String[] columnNames = 
             {
-                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
-                "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio", 
-                "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
-                "Código Evento", "Descripción Evento", "Origen", "Tipo Documento", "Estado",
-                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
+                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", 
+                "Identificación Alerta", "Nombre Activo", "Proceso", "Latencia", 
+                "Tipo Servicio", "CI", "Subtipo Servicio", "Jitter", "Disponibilidad", 
+                "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa", "Código Evento", 
+                "Descripción Evento", "Origen", "Tipo Documento", "Estado", 
+                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado", 
+                "GPS X", "GPS Y", "GPS Z", "GPS H", "Radio", "Severidad", 
+                "User ID", "Comentario", "Valida", "OT", "Ticket", 
+                "Fecha Reconocimiento", "Grupo Local"
             };
 
             JPanel formPanel = new JPanel();
@@ -174,6 +180,7 @@ public class FigurasDivididas
                     // Verificar que el elemento no sea null antes de convertirlo a String
                     if (elem != null) 
                     {
+                        System.out.println(elem);
                         listaAlertData.add(elem.toString()); // Convertir a String de forma segura
                     } 
                     else 
@@ -188,14 +195,20 @@ public class FigurasDivididas
             detailFrame.setLayout(new BorderLayout());
             detailFrame.setSize(800, 600);
 
+
             String[] columnNames = 
             {
-                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
-                "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio", 
-                "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
-                "Código Evento", "Descripción Evento", "Origen", "Tipo Documento", "Estado",
-                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
+                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", 
+                "Identificación Alerta", "Nombre Activo", "Proceso", "Latencia", 
+                "Tipo Servicio", "CI", "Subtipo Servicio", "Jitter", "Disponibilidad", 
+                "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa", "Código Evento", 
+                "Descripción Evento", "Origen", "Tipo Documento", "Estado", 
+                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado", 
+                "GPS X", "GPS Y", "GPS Z", "GPS H", "Radio", "Severidad", 
+                "User ID", "Comentario", "Valida", "OT", "Ticket", 
+                "Fecha Reconocimiento", "Grupo Local"
             };
+
 
 
             JPanel formPanel = new JPanel();
@@ -305,13 +318,18 @@ public class FigurasDivididas
             detailFrame.setLayout(new BorderLayout());
             detailFrame.setSize(800, 600);
 
+            
             String[] columnNames = 
             {
-                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", "Identificación Alerta",
-                "Nombre Activo", "Proceso", "Latencia", "Tipo Servicio", "CI", "Subtipo Servicio", 
-                "Jitter", "Disponibilidad", "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa",
-                "Código Evento", "Descripción Evento", "Origen", "Tipo Documento", "Estado",
-                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado"
+                "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", 
+                "Identificación Alerta", "Nombre Activo", "Proceso", "Latencia", 
+                "Tipo Servicio", "CI", "Subtipo Servicio", "Jitter", "Disponibilidad", 
+                "Packet Lost", "RSSI", "NSR", "PLM", "Tipo ExWa", "Código Evento", 
+                "Descripción Evento", "Origen", "Tipo Documento", "Estado", 
+                "Resumen", "Título", "Número", "Fecha Estado", "Razón Estado", 
+                "GPS X", "GPS Y", "GPS Z", "GPS H", "Radio", "Severidad", 
+                "User ID", "Comentario", "Valida", "OT", "Ticket", 
+                "Fecha Reconocimiento", "Grupo Local"
             };
 
 

@@ -1,9 +1,7 @@
 com\example\alertas\MainSwing$9.class
 com\example\FigurasDivididas$TrianguloPanel.class
-com\example\header\AlertasConfig.class
 com\example\alertas\MainSwing$3.class
 com\example\alertas\MainSwing$4.class
-com\example\header\Configuracion.class
 com\example\FigurasDivididas$CirculoPanel$2.class
 com\example\FigurasDivididas$TrianguloPanel$2.class
 com\example\FigurasDivididas$CirculoPanel.class
@@ -18,7 +16,7 @@ com\example\alertas\MainSwing$5.class
 com\example\alertas\MainSwing$1.class
 com\example\alertas\MainSwing$7.class
 com\example\alertas\MainSwing.class
-com\example\alertas\MainSwing$10.class
+com\example\configuracion\AlertasConfig.class
 com\example\alertas\MainSwing$2.class
 com\example\FigurasDivididas$CuadradoPanel.class
 com\example\alertas\MainSwing$6.class
