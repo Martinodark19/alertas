@@ -352,13 +352,17 @@ JPanel figureLegendPanel = ShapePanel.createFigureTipoServicioPanel();
 // Configurar el GridBagConstraints para la leyenda
 gbc.gridx = 0;
 gbc.gridy = 1; // Posición debajo de las secciones
-gbc.weightx = 1;
+gbc.weightx = 0;
 gbc.weighty = 0; // No ocupa espacio extra vertical
 gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
 gbc.fill = GridBagConstraints.HORIZONTAL; // Solo se expande horizontalmente
 contentPanel.add(figureLegendPanel, gbc);
 
 
+// Elimina bordes en los paneles
+sectionsPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
+//figureLegendPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
+//contentPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes en el contenedor principal
 
         // Configuración de las tablas para que ocupen más espacio en la pantalla
         tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));
@@ -831,11 +835,14 @@ contentPanel.add(figureLegendPanel, gbc);
         // Configuración de las tablas
         gbc.gridx = 0;
         gbc.gridy = 2; // Posición debajo de la leyenda
-        gbc.weightx = 1;
-        gbc.weighty = 0.8; // Las tablas ocupan el 80% del espacio vertical
+        gbc.weightx = 8;
+        gbc.weighty = 0.9; // Las tablas ocupan el 80% del espacio vertical
         gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
         gbc.fill = GridBagConstraints.BOTH;
         contentPanel.add(tablesPanel, gbc);
+
+
+        
 
         // Añadir el panel principal y el contenido al frame
         mainPanel.add(header, BorderLayout.NORTH);
@@ -872,11 +879,6 @@ contentPanel.add(figureLegendPanel, gbc);
         {
             tablesPanel.setVisible(true);
         }
-
-
-
-
-
 
     }
 
