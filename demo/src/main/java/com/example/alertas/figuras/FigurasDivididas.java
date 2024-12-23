@@ -180,7 +180,6 @@ public class FigurasDivididas
                     // Verificar que el elemento no sea null antes de convertirlo a String
                     if (elem != null) 
                     {
-                        System.out.println(elem);
                         listaAlertData.add(elem.toString()); // Convertir a String de forma segura
                     } 
                     else 

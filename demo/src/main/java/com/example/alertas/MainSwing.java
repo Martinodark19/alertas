@@ -57,8 +57,9 @@ public class MainSwing
     public static JPanel sectionsPanel;
 
     public static JButton selectedColorButton; // Para actualizar el color del botón en el diálogo de Configurar Alerta
-    public static JButton selectedColorButtonForAlertConfigColor; // Para actualizar el color del botón en el diálogo de
-                                                            // Configurar Alerta
+    //public static JButton selectedColorButtonForAlertConfigColor; // Para actualizar el color del botón en el diálogo de
+
+    // Configurar Alerta
     private Object[] lastAlert = new Object[30]; // Inicializada con un array de 30 elementos
 
     // variable que contendra la informacion de la ultima alerta ingresada para el
@@ -79,8 +80,6 @@ public class MainSwing
 
     // timer para la actualizacion de la tabla basada en los MS
     private Timer timer;
-    
-
     private JFrame frame;
 
     // variable encargada de la logica para tomar decision en el timmer
@@ -88,7 +87,6 @@ public class MainSwing
 
     // variable contendra los ms para timming
     private Integer timeForTimmerUpdated;
-
     public static DatabaseConnection databaseConnection;
     public static AlertasConfig alertasConfig;
 
@@ -129,6 +127,8 @@ public class MainSwing
 
     public MainSwing(DatabaseConnection databaseConnection) 
     {
+
+
 
             // Colores por defecto
 
@@ -242,8 +242,8 @@ public class MainSwing
             figuresPanelLeft.setOpaque(false);
             figuresPanelLeft.add(figuresPanel);
             figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS));
-            figuresPanelLeft.setMinimumSize(new Dimension(39, 39));
-            figuresPanelLeft.setMaximumSize(new Dimension(39, 39));
+            figuresPanelLeft.setMinimumSize(new Dimension(47, 47));
+            figuresPanelLeft.setMaximumSize(new Dimension(47, 47));
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -264,6 +264,7 @@ public class MainSwing
                     ModificadoresInterfaz.showColorPickerModal(frame);
                 }
             });
+
 
             // Botón de Cambiar Título
             JButton changeTitleButton = new JButton("Cambiar Título");
@@ -871,6 +872,11 @@ contentPanel.add(figureLegendPanel, gbc);
         {
             tablesPanel.setVisible(true);
         }
+
+
+
+
+
 
     }
 

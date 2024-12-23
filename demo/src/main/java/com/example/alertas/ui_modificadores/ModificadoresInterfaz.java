@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -31,6 +32,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.Timer;
 
 import com.example.alertas.MainSwing;
 import com.example.alertas.configuracion.ConfigProperties;
@@ -131,14 +133,30 @@ public class ModificadoresInterfaz
         }
 
 
+        public static JButton selectedColorButtonForAlertConfigColor; // Para actualizar el color del botón en el diálogo de
+        private static JButton saveButton = new JButton("Guardar");
+
         public static void showAlertConfigDialog(JFrame owner) 
         {
+            colorMap.put("Rojo",    "#FF0000");
+            colorMap.put("Verde",   "#00FF00");
+            colorMap.put("Azul",    "#0000FF");
+            colorMap.put("Cian",    "#00FFFF");
+            colorMap.put("Magenta", "#FF00FF");
+            colorMap.put("Amarillo","#FFFF00");
+            colorMap.put("Negro",   "#000000");
+            colorMap.put("Blanco",  "#FFFFFF");
+            colorMap.put("Gris",    "#808080");
+            colorMap.put("Naranja", "#FFA500");
+            colorMap.put("Púrpura", "#800080");
+            colorMap.put("Rosa",    "#FFC0CB");
+
+            selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
+
+            selectedColorButtonForAlertConfigColor.setEnabled(false); // Deshabilitado inicialmente
+
 
             // Crear el botón ANTES de usarlo
-            MainSwing.selectedColorButtonForAlertConfigColor = new JButton("Seleccionar Color");
-
-
-
 
             JDialog alertDialog = new JDialog(owner, "Configurar Alerta", true);
             alertDialog.setSize(400, 300);
@@ -157,32 +175,8 @@ public class ModificadoresInterfaz
             //alertTypeComboBox.setSelectedItem(alertTypeFromProperties);
 
             alertTypeComboBox.setSelectedItem(MainSwing.alertasConfig.getTipoAlerta());
-            // Verificar si el valor de alertTypeFromProperties está en los valores permitidos
-            /* 
-            if (Arrays.asList(alertTypes).contains(alertTypeFromProperties)) 
-            {
-                alertTypeComboBox.setSelectedItem(alertTypeFromProperties);
-                // Cambiar el color del texto deshabilitado
-                UIManager.put("ComboBox.disabledForeground", new Color(0, 0, 255)); // Azul
 
-                // Actualizar la apariencia del ComboBox
-                SwingUtilities.updateComponentTreeUI(alertTypeComboBox);
-                alertTypeComboBox.setEnabled(true);
-            } 
-            else 
-            {
-                // Mostrar mensaje al usuario
-                JOptionPane.showMessageDialog(null, 
-                    "El valor configurado para 'alert.type' es inválido o no permitido: '" + alertTypeFromProperties + "'.\n" +
-                    "Por favor, asegúrese de que el valor esté entre los siguientes: " + String.join(", ", alertTypes) + ".\n" +
-                    "Se usará el valor por defecto: 1.", 
-                    "Advertencia de Configuración", 
-                    JOptionPane.WARNING_MESSAGE);
 
-                // Usar un valor por defecto
-                alertTypeComboBox.setSelectedItem("1");
-            }
-            */
             String alertSeverityFromProperties = MainSwing.alertasConfig.getSeveridad();
 
             // Convertir la primera letra a mayúscula
@@ -194,56 +188,43 @@ public class ModificadoresInterfaz
 
             // Severidad
             JLabel severityLabel = new JLabel("Severidad:");
-            String[] severities = { "Critica","Alta", "Media", "Baja" };
+            String[] severities = {"Seleccionar...","Critica","Alta", "Media", "Baja" };
             
             JComboBox<String> severityComboBox = new JComboBox<>(severities);
-            severityComboBox.setSelectedItem(MainSwing.alertasConfig.getSeveridad());
-            /* 
-            if (Arrays.asList(severities).contains(alertSeverityFromProperties)) 
-            {
-                //verifica si el map contiene la severidad 
-                if (coloresPorSeveridadMap.containsKey(severityComboBox.getSelectedItem())) 
-                {
-                    //obtener el color de la severidad
-                    Color colorSeveridad = coloresPorSeveridadMap.get(severityComboBox.getSelectedItem());
-                    //asignar el color al boton
-                    selectedColorButtonForAlertConfigColor.setBackground(colorSeveridad);
-                }
-                else
-                {
-                    System.out.println("paso por el else");
-                    
-                }
-                severityComboBox.setSelectedItem(alertSeverityFromProperties);
-                //añaidr el color de la severidad al map para que en solicitudes futuras se pueda obtener el color en el map
-                
-                severityComboBox.setEnabled(true);
-            } 
-            else 
-            {
-                // Mostrar mensaje al usuario si el valor no es válido
-                JOptionPane.showMessageDialog(null,
-                    "El valor configurado para 'alert.severity' es inválido o no permitido: '" + alertSeverityFromProperties + "'.\n" +
-                    "Por favor, asegúrese de que el valor esté entre los siguientes: " + String.join(", ", severities) + ".\n" +
-                    "Se usará el valor predeterminado: Media.",
-                    "Advertencia de Configuración",
-                    JOptionPane.WARNING_MESSAGE);
-            
-                // Usar un valor por defecto si el valor de la propiedad no es válido
-                severityComboBox.setSelectedItem("Media");
-            }
+            severityComboBox.setSelectedItem("Seleccionar...");
 
-            */
+            selectedColorButtonForAlertConfigColor.setEnabled(false);
+            saveButton.setEnabled(false);
+            
+ 
+
+
+            //severityComboBox.setSelectedItem(MainSwing.alertasConfig.getSeveridad());
+            //severityComboBox.setSelectedIndex(-1);
+
             //Obtener severidad para actualizar color
             final String[] selectedSeverity = {""};
 
             // Agregar ActionListener al JComboBox de severidades
-
             severityComboBox.addActionListener(new ActionListener() 
             {
                 @Override
                 public void actionPerformed(ActionEvent e) 
-                {
+                {   
+                    // Ajustado para que reciba Map<String, String>
+                    //eliminarColoresDeSeveridad(colorMap);
+
+                    if(severityComboBox.getSelectedItem().equals("Seleccionar..."))
+                    {
+                        selectedColorButtonForAlertConfigColor.setEnabled(false);
+                        saveButton.setEnabled(false);
+                    }
+                    else
+                    {
+                        selectedColorButtonForAlertConfigColor.setEnabled(true);
+                        saveButton.setEnabled(true);
+                    }
+
                     // Obtener la severidad seleccionada
                     selectedSeverity[0] = (String) severityComboBox.getSelectedItem();
 
@@ -255,12 +236,12 @@ public class ModificadoresInterfaz
                         //actualizar el mapa por que cambio la severidad
                         MainSwing.coloresPorSeveridadMap.put(selectedSeverity[0], colorDeLaSeveridad);
 
-                        MainSwing.selectedColorButtonForAlertConfigColor.setBackground(colorDeLaSeveridad);
+                        selectedColorButtonForAlertConfigColor.setBackground(colorDeLaSeveridad);
                     } 
                     else 
                     {
                         // Si no existe una entrada en el mapa para esta severidad, puedes poner un color por defecto
-                        MainSwing.selectedColorButtonForAlertConfigColor.setBackground(Color.GRAY);
+                        selectedColorButtonForAlertConfigColor.setBackground(Color.GRAY);
                     }
                     
                     // Confirmar en consola
@@ -284,83 +265,32 @@ public class ModificadoresInterfaz
             JComboBox<String> shapeComboBox = new JComboBox<>(shapes);
             shapeComboBox.setSelectedItem(MainSwing.alertasConfig.getForma());
 
-            /* 
-            // Validar si el valor de 'alert.shape' está entre las opciones válidas
-            if (Arrays.asList(shapes).contains(alertShapeFromProperties)) 
-            {
-                shapeComboBox.setSelectedItem(alertShapeFromProperties);
-                shapeComboBox.setEnabled(true);
-            } 
-            else 
-            {
-                // Mostrar mensaje al usuario si el valor no es válido
-                JOptionPane.showMessageDialog(null,
-                    "El valor configurado para 'alert.shape' es inválido o no permitido: '" + alertShapeFromProperties + "'.\n" +
-                    "Por favor, asegúrese de que el valor esté entre los siguientes: " + String.join(", ", shapes) + ".\n" +
-                    "Se usará el valor predeterminado: Círculo.",
-                    "Advertencia de Configuración",
-                    JOptionPane.WARNING_MESSAGE);
-
-                // Usar un valor por defecto si el valor de la propiedad no es válido
-                shapeComboBox.setSelectedItem("Circulo");
-            }
-
-            */
             // Color
             JLabel colorLabel = new JLabel("Color:");
 
-
-            //obtener color desde el map de basado en las severidades
-            //Color getColorFromSeverity = severityColorMap.get(severityComboBox.getSelectedItem());
-
-
-            //selectedColorButtonForAlertConfigColor.setBackground(getColorFromSeverity);
-
             // Usar un arreglo para almacenar severityColor
 
-            
             final Color[] severityColor = new Color[1];    
 
-            MainSwing.selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() 
+            selectedColorButtonForAlertConfigColor.addActionListener(new ActionListener() 
             {
                 @Override
                 public void actionPerformed(ActionEvent e) 
                 {
-                                    // Ejemplo: Actualizar un color basado en la severidad
-
-                                    /* 
-                                    switch (selectedSeverity[0]) 
-                                    {
-                                        case "Alta":
-                                        severityColor[0] = coloresPorSeveridadMap.get("Alta");
-                                            break;
-                                        case "Media":
-                                        severityColor[0] = coloresPorSeveridadMap.get("Media");
-                                        break;
-                                        case "Baja":
-                                        severityColor[0] = coloresPorSeveridadMap.get("Baja");
-                                        break;
-                                        case "Información":
-                                            System.out.println("Paso por informacion");
-                                            break;
-                                        default:
-                                        
-                                        severityColor[0] = Color.GRAY; // Por defecto
-                                            break;
-                                    }
-                                    */
-                                    // Cambiar el fondo del JFrame como ejemplo visual
-                                    //frame.getContentPane().setBackground(severityColor)
 
                     String severidadActual = selectedSeverity[0];
 
+                                // Obtener los colores ya asignados
+                    Map<String, Color> coloresAsignados = MainSwing.coloresPorSeveridadMap;
+
                     // Llama al modal del selector de color para las alertas
-                    Color selectedColor = ModificadoresInterfaz.showColorPickerModalForAlerts(owner);
+                    Color selectedColor = showColorPickerModalForAlerts(alertDialog, coloresAsignados);
 
                     // Si se selecciona un color (no se cierra el modal sin elegir)
-                    if (selectedColor != null) {
+                    if (selectedColor != null) 
+                    {
                         // Cambiar el color de fondo del botón al color seleccionado
-                        MainSwing.selectedColorButtonForAlertConfigColor.setBackground(selectedColor);
+                        selectedColorButtonForAlertConfigColor.setBackground(selectedColor);
                         MainSwing.coloresPorSeveridadMap.put(severidadActual, selectedColor);
 
                         // Opcional: si quieres guardar este color en alguna variable de configuración
@@ -374,8 +304,8 @@ public class ModificadoresInterfaz
             try 
             {
 
-                MainSwing.selectedColorButtonForAlertConfigColor.setBackground(MainSwing.alertasConfig.getColor());
-                MainSwing.selectedColorButtonForAlertConfigColor.setEnabled(true);
+                selectedColorButtonForAlertConfigColor.setBackground(MainSwing.alertasConfig.getColor());
+                //selectedColorButtonForAlertConfigColor.setEnabled(true);
             } 
             catch (NumberFormatException e) 
             {
@@ -389,12 +319,12 @@ public class ModificadoresInterfaz
                     JOptionPane.WARNING_MESSAGE
                 );
                 // Configura un color por defecto
-                MainSwing.selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
+                selectedColorButtonForAlertConfigColor.setBackground(Color.LIGHT_GRAY);
             }
 
             // Panel para el botón Guardar
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-            JButton saveButton = new JButton("Guardar");
+            //JButton saveButton = new JButton("Guardar");
 
             // Acción del botón Guardar
             saveButton.addActionListener(e -> {
@@ -402,7 +332,7 @@ public class ModificadoresInterfaz
                 MainSwing.alertasConfig.setTipoAlerta((String) alertTypeComboBox.getSelectedItem());
                 MainSwing.alertasConfig.setSeveridad((String) severityComboBox.getSelectedItem());
                 MainSwing.alertasConfig.setForma((String) shapeComboBox.getSelectedItem());
-                MainSwing.alertasConfig.setColor(MainSwing.selectedColorButtonForAlertConfigColor.getBackground());
+                MainSwing.alertasConfig.setColor(selectedColorButtonForAlertConfigColor.getBackground());
 
                 JOptionPane.showMessageDialog(alertDialog, "Configuración guardada con éxito.");
                 MainSwing.alertasConfig.saveConfig();
@@ -420,7 +350,7 @@ public class ModificadoresInterfaz
             configPanel.add(shapeLabel);
             configPanel.add(shapeComboBox);
             configPanel.add(colorLabel);
-            configPanel.add(MainSwing.selectedColorButtonForAlertConfigColor);
+            configPanel.add(selectedColorButtonForAlertConfigColor);
 
             // Agregar el panel de configuración y el panel del botón al diálogo
             alertDialog.add(configPanel, BorderLayout.CENTER);
@@ -556,88 +486,99 @@ public class ModificadoresInterfaz
         }
 
 
-        public static Color showColorPickerModalForAlerts(JFrame owner) 
-        {
-            JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
-            colorDialog.setSize(600, 400);
-            colorDialog.setLayout(new BorderLayout());
-    
-            JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
-            colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-    
-            String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
-                    "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
-    
-            final Color[] selectedColor = { null }; // Array para almacenar el color seleccionado
-    
-            for (String color : colors) 
-            {
-                JButton colorButton = new JButton();
-                colorButton.setBackground(Color.decode(color));
-                colorButton.setPreferredSize(new Dimension(50, 50));
-    
-                // Evento al hacer clic en un color
-                colorButton.addActionListener(e -> {
-                    selectedColor[0] = Color.decode(color); // Almacenar el color seleccionado
-                    colorDialog.dispose(); // Cerrar el modal una vez seleccionado
+        public static Map<String, String> colorMap = new LinkedHashMap<>();
+
+        public static Color showColorPickerModalForAlerts(JDialog owner, Map<String, Color> coloresAsignados) 
+{
+    // Crear una copia del colorMap para evitar modificar el mapa estático original
+    Map<String, String> coloresDisponibles = new LinkedHashMap<>(colorMap);
+
+    // Eliminar los colores ya asignados
+    for (Color colorAsignado : coloresAsignados.values()) {
+        coloresDisponibles.entrySet().removeIf(entry -> {
+            Color color = Color.decode(entry.getValue());
+            return color.equals(colorAsignado);
+        });
+    }
+
+    // Crear el diálogo para seleccionar color
+    JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
+    colorDialog.setSize(600, 400);
+    colorDialog.setLayout(new BorderLayout());
+
+    JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
+    colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+    final Color[] selectedColor = { null }; // Array para almacenar el color seleccionado
+
+    // Crear un botón por cada color disponible
+    for (Map.Entry<String, String> entry : coloresDisponibles.entrySet()) 
+    {
+        String colorHex = entry.getValue();
+
+        JButton colorButton = new JButton();
+        colorButton.setBackground(Color.decode(colorHex));
+        colorButton.setPreferredSize(new Dimension(50, 50));
+        colorButton.setFocusPainted(false);
+        colorButton.setBorderPainted(false); // Opcional: elimina el borde del botón
+        colorButton.setOpaque(true); // Asegura que el color de fondo se muestre correctamente
+
+        // Acción al hacer clic: se selecciona el color y se cierra el modal
+        colorButton.addActionListener(e -> {
+            selectedColor[0] = Color.decode(colorHex);
+            colorDialog.dispose();
+        });
+
+        colorButtonsPanel.add(colorButton);
+    }
+
+    // Botón de cerrar sin seleccionar un color
+    JButton closeButton = new JButton("Cerrar");
+    closeButton.addActionListener(e -> colorDialog.dispose());
+
+    JPanel bottomPanel = new JPanel();
+    bottomPanel.add(closeButton);
+
+    colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
+    colorDialog.add(bottomPanel, BorderLayout.SOUTH);
+
+    colorDialog.setLocationRelativeTo(owner);
+    colorDialog.setVisible(true);
+
+    return selectedColor[0]; // Devolver el color seleccionado
+}
+
+
+        
+        /**
+         * Ajusta el método para recibir un Map<String, String>,
+         * porque 'colorMap' usa hexadecimales.
+         */
+        public static void eliminarColoresDeSeveridad(Map<String, String> colorMap) {
+            // Obtenemos el mapa de severidad (String -> Color)
+            Map<String, Color> severidadMap = MainSwing.getColoresPorSeveridadMap();
+        
+            // Eliminamos las entradas de 'colorMap' cuyo valor, decodificado, coincide
+            // con alguno de los valores de severidadMap.
+            for (Color colorSeveridad : severidadMap.values()) {
+                colorMap.entrySet().removeIf(entry -> {
+                    Color decodedColor = Color.decode(entry.getValue());
+
+
+                    return decodedColor.equals(colorSeveridad);
                 });
-    
-                colorButtonsPanel.add(colorButton);
             }
-    
-            // Botón de cerrar sin seleccionar un color
-            JButton closeButton = new JButton("Cerrar");
-            closeButton.addActionListener(e -> colorDialog.dispose());
-    
-            JPanel bottomPanel = new JPanel();
-            bottomPanel.add(closeButton);
-    
-            colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
-            colorDialog.add(bottomPanel, BorderLayout.SOUTH);
-    
-            colorDialog.setLocationRelativeTo(owner);
-            colorDialog.setVisible(true);
-    
-            return selectedColor[0]; // Devolver el color seleccionado
         }
+        
 
 
-        public static void showColorPickerModal(JFrame owner) 
-        {
-            JDialog colorDialog = new JDialog(owner, "Seleccione un colorPOOO", true);
-            colorDialog.setSize(600, 400);
-            colorDialog.setLayout(new BorderLayout());
-    
-            JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
-            colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-    
-            String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
-                    "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
-    
-            for (String color : colors) 
-            {
-                JButton colorButton = ModificadoresInterfaz.createColorButton(color);
-                colorButtonsPanel.add(colorButton);
-            }
-    
-            JButton closeButton = new JButton("Cerrar");
-            closeButton.addActionListener(e -> colorDialog.dispose());
-    
-            JPanel bottomPanel = new JPanel();
-            bottomPanel.add(closeButton);
-    
-            colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
-            colorDialog.add(bottomPanel, BorderLayout.SOUTH);
-    
-            colorDialog.setLocationRelativeTo(owner);
-            colorDialog.setVisible(true);
-        }
 
         public static void addSpecificSectionsFromMap(int[] sectionsToAdd) 
         {
             for (int index : sectionsToAdd) {
                 JPanel sectionPanel = MainSwing.allSections.get(index);
-                if (sectionPanel != null && sectionPanel.getParent() == null) {
+                if (sectionPanel != null && sectionPanel.getParent() == null) 
+                {
                     // Agrega la sección en su posición original
                     MainSwing.sectionsPanel.add(sectionPanel, index - 1); // Restamos 1 si los índices comienzan en 1
                 }
