@@ -198,12 +198,32 @@ public class MainSwing
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
 
-
-
+        // Crear las secciones
         for (int i = 1; i <= 8; i++) 
         {
+
+
+            String colorHex = ConfigProperties.getProperty("seccion" + i + ".color").trim();
+
+
+            // Validar si el color es nulo o vacío
+            if (colorHex == null || colorHex.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    null, 
+                    "El valor para 'section" + i + ".color' no está definido o está vacío en el archivo de configuración.\n" +
+                    "Por favor, verifica que el archivo 'config.properties' contenga un valor válido para esta clave.\n" +
+                    "Se usará el color predeterminado: #cccccc.", 
+                    "Error en Configuración", 
+                    JOptionPane.WARNING_MESSAGE
+                );
+        
+                // Usar un color predeterminado
+                colorHex = "#cccccc";
+            }
+
+
             JPanel sectionPanel = new JPanel(new BorderLayout());
-            sectionPanel.setBackground(Color.decode("#cccccc"));
+            sectionPanel.setBackground(Color.decode(colorHex));
             sectionPanel.setBorder(new EmptyBorder(7, 7, 7, 7)); // Reducimos los bordes internos
             sectionPanel.setName("Section-" + i);
 
@@ -338,31 +358,31 @@ public class MainSwing
 
 
         // Añadir secciones al GridBagLayout
-gbc.gridx = 0;
-gbc.gridy = 0;
-gbc.weightx = 1;
-gbc.weighty = 0.2; // Las secciones ocupan un 20% del espacio vertical
-gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
-gbc.fill = GridBagConstraints.BOTH;
-contentPanel.add(sectionsPanel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 0.2; // Las secciones ocupan un 20% del espacio vertical
+        gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
+        gbc.fill = GridBagConstraints.BOTH;
+        contentPanel.add(sectionsPanel, gbc);
 
-// Crear la leyenda de figuras
-JPanel figureLegendPanel = ShapePanel.createFigureTipoServicioPanel();
+        // Crear la leyenda de figuras
+        JPanel figureLegendPanel = ShapePanel.createFigureTipoServicioPanel();
 
-// Configurar el GridBagConstraints para la leyenda
-gbc.gridx = 0;
-gbc.gridy = 1; // Posición debajo de las secciones
-gbc.weightx = 0;
-gbc.weighty = 0; // No ocupa espacio extra vertical
-gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
-gbc.fill = GridBagConstraints.HORIZONTAL; // Solo se expande horizontalmente
-contentPanel.add(figureLegendPanel, gbc);
+        // Configurar el GridBagConstraints para la leyenda
+        gbc.gridx = 0;
+        gbc.gridy = 1; // Posición debajo de las secciones
+        gbc.weightx = 0;
+        gbc.weighty = 0; // No ocupa espacio extra vertical
+        gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Solo se expande horizontalmente
+        contentPanel.add(figureLegendPanel, gbc);
 
 
-// Elimina bordes en los paneles
-sectionsPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
-//figureLegendPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
-//contentPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes en el contenedor principal
+        // Elimina bordes en los paneles
+        sectionsPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
+        //figureLegendPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
+        //contentPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes en el contenedor principal
 
         // Configuración de las tablas para que ocupen más espacio en la pantalla
         tablesPanel = new JPanel(new GridLayout(1, 3, 10, 10));

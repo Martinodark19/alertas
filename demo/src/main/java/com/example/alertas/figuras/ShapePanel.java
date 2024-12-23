@@ -15,7 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class ShapePanel extends JPanel {
+public class ShapePanel extends JPanel 
+{
 
     private String shapeType; // Tipo de figura: "circulo", "cuadrado", "triangulo"
     private Color color;

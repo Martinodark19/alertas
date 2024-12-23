@@ -172,9 +172,8 @@ public class ModificadoresInterfaz
             JLabel alertTypeLabel = new JLabel("Tipo de Alerta:");
             String[] alertTypes = { "1", "2", "3", "4" };
             JComboBox<String> alertTypeComboBox = new JComboBox<>(alertTypes);
-            //alertTypeComboBox.setSelectedItem(alertTypeFromProperties);
-
             alertTypeComboBox.setSelectedItem(MainSwing.alertasConfig.getTipoAlerta());
+
 
 
             String alertSeverityFromProperties = MainSwing.alertasConfig.getSeveridad();
@@ -602,6 +601,38 @@ public class ModificadoresInterfaz
             MainSwing.sectionsPanel.repaint();
         }
 
+
+                    // Método para mostrar el modal del selector de color
+    public static void showColorPickerModal(JFrame owner) 
+    {
+        JDialog colorDialog = new JDialog(owner, "Seleccione un color", true);
+        colorDialog.setSize(600, 400);
+        colorDialog.setLayout(new BorderLayout());
+
+        JPanel colorButtonsPanel = new JPanel(new GridLayout(2, 6, 10, 10));
+        colorButtonsPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        String[] colors = { "#FF0000", "#00FF00", "#0000FF", "#00FFFF", "#FF00FF", "#FFFF00",
+                "#000000", "#FFFFFF", "#808080", "#FFA500", "#800080", "#FFC0CB" };
+
+        for (String color : colors) 
+        {
+            JButton colorButton = createColorButton(color);
+            colorButtonsPanel.add(colorButton);
+        }
+
+        JButton closeButton = new JButton("Cerrar");
+        closeButton.addActionListener(e -> colorDialog.dispose());
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(closeButton);
+
+        colorDialog.add(colorButtonsPanel, BorderLayout.CENTER);
+        colorDialog.add(bottomPanel, BorderLayout.SOUTH);
+
+        colorDialog.setLocationRelativeTo(owner);
+        colorDialog.setVisible(true);
+    }
 
 
 
