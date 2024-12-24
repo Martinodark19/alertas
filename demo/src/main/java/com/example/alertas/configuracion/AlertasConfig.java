@@ -14,6 +14,10 @@ public class AlertasConfig
     private String severidad;
     private String forma;
     private Color color;
+
+
+    //Atributo para el comentario de la tabla para marcarla como leida
+    private String comentario; 
     
 
 
@@ -69,6 +73,16 @@ public class AlertasConfig
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public String getComentario() 
+    {
+        return comentario;
+    }
+
+    public void setComentario(String comentario) 
+    {
+        this.comentario = comentario;
     }
 
 

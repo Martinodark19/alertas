@@ -1,10 +1,15 @@
 package com.example.alertas.configuracion;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,6 +178,102 @@ public class DatabaseConnection
             }
             return results;
         }
+
+
+        public boolean actualizarAlertaValid(int alertId, String usuario, String comentario) 
+        {
+            // Definir la URL de la base de datos y cualquier configuración adicional.
+
+            try (Connection conn = DriverManager.getConnection(DB_URL)) 
+            { // Cambia usuario y contraseña según tu BD
+                // Consultar si la alerta existe
+                try (PreparedStatement selectStatement = conn.prepareStatement("SELECT alertaid FROM alertas WHERE alertaid = ?")) 
+                {
+                    selectStatement.setInt(1, alertId);
+                    try (ResultSet resultSet = selectStatement.executeQuery()) 
+                    {
+                        
+                    // Obtener la fecha y hora actual
+                    LocalDateTime fechaHoraActual = LocalDateTime.now();
+
+                    // Convertir LocalDateTime a Timestamp
+                    Timestamp timestamp = Timestamp.valueOf(fechaHoraActual);
+
+                        if (resultSet.next()) 
+                        {
+                            // Si existe, actualizar usuario y comentario
+                            try (PreparedStatement updateStatement = conn.prepareStatement(
+                                    "UPDATE alertas SET userid = ?, comentario = ?, fecha_reconocimiento = ? WHERE alertaid = ?")) 
+                            {
+                                updateStatement.setString(1, usuario);
+                                updateStatement.setString(2, comentario);
+                                updateStatement.setTimestamp(3, timestamp);
+                                updateStatement.setInt(4, alertId);
+        
+                                int rowsAffected = updateStatement.executeUpdate();
+                                return rowsAffected > 0; // Retorna true si la actualización fue exitosa
+                            }
+                        } 
+                        else 
+                        {
+                            return false; // La alerta no existe
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false; // Error durante la operación
+            }
+        }
+
+
+
+        public boolean actualizarAlerta(int alertId, String usuario) 
+        {
+            // Definir la URL de la base de datos y cualquier configuración adicional.
+
+            try (Connection conn = DriverManager.getConnection(DB_URL)) 
+            { // Cambia usuario y contraseña según tu BD
+                // Consultar si la alerta existe
+                try (PreparedStatement selectStatement = conn.prepareStatement("SELECT alertaid FROM alertas WHERE alertaid = ?")) 
+                {
+                    selectStatement.setInt(1, alertId);
+                    try (ResultSet resultSet = selectStatement.executeQuery()) 
+                    {
+                        
+                    // Obtener la fecha y hora actual
+                    LocalDateTime fechaHoraActual = LocalDateTime.now();
+
+                    // Convertir LocalDateTime a Timestamp
+                    Timestamp timestamp = Timestamp.valueOf(fechaHoraActual);
+
+                        if (resultSet.next()) 
+                        {
+                            // Si existe, actualizar usuario y comentario
+                            try (PreparedStatement updateStatement = conn.prepareStatement(
+                                    "UPDATE alertas SET userid = ?, fecha_reconocimiento = ? WHERE alertaid = ?")) 
+                            {
+                                updateStatement.setString(1, usuario);
+                                updateStatement.setTimestamp(2, timestamp);
+                                updateStatement.setInt(3, alertId);
+        
+                                int rowsAffected = updateStatement.executeUpdate();
+                                return rowsAffected > 0; // Retorna true si la actualización fue exitosa
+                            }
+                        } 
+                        else 
+                        {
+                            return false; // La alerta no existe
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false; // Error durante la operación
+            }
+        }
+        
+        
         
         
 

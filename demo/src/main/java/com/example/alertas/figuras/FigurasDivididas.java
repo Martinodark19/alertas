@@ -1,13 +1,35 @@
 package com.example.alertas.figuras;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
+import com.example.alertas.MainSwing;
+import com.example.alertas.configuracion.DatabaseConnection;
+import com.example.alertas.ui_modificadores.ModificadoresInterfaz;
+import com.sun.tools.javac.Main;
 
 
 public class FigurasDivididas 
@@ -51,11 +73,20 @@ public class FigurasDivididas
 
         private void openDetailWindow() 
         {
-
             List<String> listaAlertData = new ArrayList<>();
+
+            Integer [] obtenerIdAlerta= new Integer[1];
+
+            char[] esValida = new char[1];
 
             for (Object[] row : data) 
             {
+                obtenerIdAlerta[0] = (Integer) row[0];
+
+                String obtenerEsValidaStringToChar = (String) row[37];
+
+                esValida[0] = obtenerEsValidaStringToChar.charAt(0);
+                
                 // Recorrer columnas
                 for (Object elem : row) 
                 {
@@ -77,7 +108,6 @@ public class FigurasDivididas
             detailFrame.setSize(800, 600);
 
 
-            
             String[] columnNames = 
             {
                 "Alert ID", "Cod Alerta", "Nombre", "Sentencia ID", "Inicio Evento", 
@@ -121,11 +151,95 @@ public class FigurasDivididas
             });
 
 
+            // Botón "Marcar como leída"
+            JButton markAsReadButton = new JButton("Marcar como leída");
+            markAsReadButton.setBackground(Color.decode("#4CAF50")); // Color verde
+            markAsReadButton.setForeground(Color.WHITE); // Texto blanco
+            markAsReadButton.setFont(new Font("Arial", Font.BOLD, 12));
+            markAsReadButton.setFocusPainted(false); // Quitar el efecto de foco
+            
+            // Acción al hacer clic en el botón
+            markAsReadButton.addActionListener(e -> {
 
+                //verificar si la alerta era valida (S,N)
+                char opcionValida = 'S';
+                if (esValida[0] == opcionValida) 
+                {
+                    String obtenerUsuario = ModificadoresInterfaz.obtenerNombreDeUsuario();
+                    if (!obtenerUsuario.isEmpty())
+                    {
+                        Boolean mostrarDialogo = ModificadoresInterfaz.showCommentDialogForValid(obtenerIdAlerta[0],obtenerUsuario);
+
+                        if (mostrarDialogo) 
+                        {
+                            Boolean eliminarFigura = ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
+                            if (eliminarFigura) 
+                            {
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                    "Actualización Exitosa",
+                                    JOptionPane.INFORMATION_MESSAGE
+                                );
+
+                                detailFrame.dispose();
+                            }
+                        }
+                        else
+                        {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "No se pudo actualizar la alerta con ID " + obtenerIdAlerta[0] + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                "Error de Actualización",
+                                JOptionPane.ERROR_MESSAGE
+                            );
+                        }
+                    }
+
+                }                                                                                                             
+                else
+                {              
+                    String obtenerUsuario = ModificadoresInterfaz.obtenerNombreDeUsuario();
+                    if (!obtenerUsuario.isEmpty())
+                    {
+                        Boolean actualizarAlerta = MainSwing.databaseConnection.actualizarAlerta(obtenerIdAlerta[0], obtenerUsuario);
+                        if (actualizarAlerta) 
+                        {
+                            
+                            ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
+
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                "Actualización Exitosa",
+                                JOptionPane.INFORMATION_MESSAGE
+                            );
+     
+                            detailFrame.dispose();
+
+                        } 
+                        else 
+                        {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "No se pudo actualizar la alerta con ID " + obtenerIdAlerta[0] + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                "Error de Actualización",
+                                JOptionPane.ERROR_MESSAGE
+                            );
+                        }
+
+
+                        
+
+                    }
+
+                }
+            });
 
             // Añadir el formulario y el botón al frame
             detailFrame.setLayout(new BorderLayout());
             detailFrame.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+            detailFrame.add(markAsReadButton, BorderLayout.SOUTH);
 
             // Mostrar el frame
             detailFrame.setLocationRelativeTo(null);
@@ -172,8 +286,18 @@ public class FigurasDivididas
         {
             List<String> listaAlertData = new ArrayList<>();
 
+            Integer [] obtenerIdAlerta= new Integer[1];
+
+            char[] esValida = new char[1];
+
             for (Object[] row : data) 
             {
+                obtenerIdAlerta[0] = (Integer) row[0];
+
+                String obtenerEsValidaStringToChar = (String) row[37];
+
+                esValida[0] = obtenerEsValidaStringToChar.charAt(0);
+                
                 // Recorrer columnas
                 for (Object elem : row) 
                 {
@@ -189,11 +313,11 @@ public class FigurasDivididas
                 }
             }
 
+
             JFrame detailFrame = new JFrame("Detalle del Cuadrado");
             detailFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             detailFrame.setLayout(new BorderLayout());
             detailFrame.setSize(800, 600);
-
 
             String[] columnNames = 
             {
@@ -208,18 +332,12 @@ public class FigurasDivididas
                 "Fecha Reconocimiento", "Grupo Local"
             };
 
-
-
             JPanel formPanel = new JPanel();
             formPanel.setLayout(new GridLayout(columnNames.length, 2, 10, 10)); // Dos columnas: etiqueta y campo de texto
             formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-
-
-
-                    // Crear un JTextField para cada campo
+            // Crear un JTextField para cada campo
             JTextField[] textFields = new JTextField[columnNames.length];
-
             for (int i = 0; i < columnNames.length; i++) 
             {
                 JLabel label = new JLabel(columnNames[i] + ":");
@@ -231,7 +349,6 @@ public class FigurasDivididas
                 formPanel.add(textField);
             }
 
-
             // Botón de Cerrar
             JButton closeButton = new JButton("Cerrar Ventana");
             closeButton.addActionListener(new ActionListener() {
@@ -241,9 +358,99 @@ public class FigurasDivididas
                 }
             });
 
+
+                        // Botón "Marcar como leída"
+                        JButton markAsReadButton = new JButton("Marcar como leída");
+                        markAsReadButton.setBackground(Color.decode("#4CAF50")); // Color verde
+                        markAsReadButton.setForeground(Color.WHITE); // Texto blanco
+                        markAsReadButton.setFont(new Font("Arial", Font.BOLD, 12));
+                        markAsReadButton.setFocusPainted(false); // Quitar el efecto de foco
+                        
+                        // Acción al hacer clic en el botón
+                        markAsReadButton.addActionListener(e -> {
+            
+                            //verificar si la alerta era valida (S,N)
+                            char opcionValida = 'S';
+                            if (esValida[0] == opcionValida) 
+                            {
+                                String obtenerUsuario = ModificadoresInterfaz.obtenerNombreDeUsuario();
+                                if (!obtenerUsuario.isEmpty())
+                                {
+                                    Boolean mostrarDialogo = ModificadoresInterfaz.showCommentDialogForValid(obtenerIdAlerta[0],obtenerUsuario);
+            
+                                    if (mostrarDialogo) 
+                                    {
+                                        Boolean eliminarFigura = ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
+                                        if (eliminarFigura) 
+                                        {
+                                            JOptionPane.showMessageDialog(
+                                                null,
+                                                "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                                "Actualización Exitosa",
+                                                JOptionPane.INFORMATION_MESSAGE
+                                            );
+            
+                                            detailFrame.dispose();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        JOptionPane.showMessageDialog(
+                                            null,
+                                            "No se pudo actualizar la alerta con ID " + obtenerIdAlerta[0] + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                            "Error de Actualización",
+                                            JOptionPane.ERROR_MESSAGE
+                                        );
+                                    }
+            
+                                }
+            
+                            }                                                                                                             
+                            else
+                            {              
+                                String obtenerUsuario = ModificadoresInterfaz.obtenerNombreDeUsuario();
+                                if (!obtenerUsuario.isEmpty())
+                                {
+                                    Boolean actualizarAlerta = MainSwing.databaseConnection.actualizarAlerta(obtenerIdAlerta[0], obtenerUsuario);
+                                    if (actualizarAlerta) 
+                                    {
+                                        
+                                        ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
+            
+                                        JOptionPane.showMessageDialog(
+                                            null,
+                                            "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                            "Actualización Exitosa",
+                                            JOptionPane.INFORMATION_MESSAGE
+                                        );
+                 
+                                        detailFrame.dispose();
+            
+                                    } 
+                                    else 
+                                    {
+                                        JOptionPane.showMessageDialog(
+                                            null,
+                                            "No se pudo actualizar la alerta con ID " + obtenerIdAlerta[0] + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                            "Error de Actualización",
+                                            JOptionPane.ERROR_MESSAGE
+                                        );
+                                    }
+            
+            
+                                    
+            
+                                }
+            
+                            }
+                        });
+
+
+
             // Añadir el formulario y el botón al frame
             detailFrame.setLayout(new BorderLayout());
             detailFrame.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+            detailFrame.add(markAsReadButton, BorderLayout.SOUTH);
 
             // Mostrar el frame
             detailFrame.setLocationRelativeTo(null);
@@ -294,8 +501,18 @@ public class FigurasDivididas
 
             List<String> listaAlertData = new ArrayList<>();
 
+            Integer [] obtenerIdAlerta= new Integer[1];
+
+            char[] esValida = new char[1];
+
             for (Object[] row : data) 
             {
+                obtenerIdAlerta[0] = (Integer) row[0];
+
+                String obtenerEsValidaStringToChar = (String) row[37];
+
+                esValida[0] = obtenerEsValidaStringToChar.charAt(0);
+                
                 // Recorrer columnas
                 for (Object elem : row) 
                 {
@@ -363,9 +580,98 @@ public class FigurasDivididas
                 }
             });
 
+                        // Botón "Marcar como leída"
+                        JButton markAsReadButton = new JButton("Marcar como leída");
+                        markAsReadButton.setBackground(Color.decode("#4CAF50")); // Color verde
+                        markAsReadButton.setForeground(Color.WHITE); // Texto blanco
+                        markAsReadButton.setFont(new Font("Arial", Font.BOLD, 12));
+                        markAsReadButton.setFocusPainted(false); // Quitar el efecto de foco
+                        
+                        // Acción al hacer clic en el botón
+                        markAsReadButton.addActionListener(e -> {
+            
+                            //verificar si la alerta era valida (S,N)
+                            char opcionValida = 'S';
+                            if (esValida[0] == opcionValida) 
+                            {
+                                String obtenerUsuario = ModificadoresInterfaz.obtenerNombreDeUsuario();
+                                if (!obtenerUsuario.isEmpty())
+                                {
+                                    Boolean mostrarDialogo = ModificadoresInterfaz.showCommentDialogForValid(obtenerIdAlerta[0],obtenerUsuario);
+            
+                                    if (mostrarDialogo) 
+                                    {
+                                        Boolean eliminarFigura = ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
+                                        if (eliminarFigura) 
+                                        {
+                                            JOptionPane.showMessageDialog(
+                                                null,
+                                                "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                                "Actualización Exitosa",
+                                                JOptionPane.INFORMATION_MESSAGE
+                                            );
+            
+                                            detailFrame.dispose();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        JOptionPane.showMessageDialog(
+                                            null,
+                                            "No se pudo actualizar la alerta con ID " + obtenerIdAlerta[0] + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                            "Error de Actualización",
+                                            JOptionPane.ERROR_MESSAGE
+                                        );
+                                    }
+            
+                                }
+            
+                            }                                                                                                             
+                            else
+                            {              
+                                String obtenerUsuario = ModificadoresInterfaz.obtenerNombreDeUsuario();
+                                if (!obtenerUsuario.isEmpty())
+                                {
+                                    Boolean actualizarAlerta = MainSwing.databaseConnection.actualizarAlerta(obtenerIdAlerta[0], obtenerUsuario);
+                                    if (actualizarAlerta) 
+                                    {
+                                        
+                                        ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
+            
+                                        JOptionPane.showMessageDialog(
+                                            null,
+                                            "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                            "Actualización Exitosa",
+                                            JOptionPane.INFORMATION_MESSAGE
+                                        );
+                 
+                                        detailFrame.dispose();
+            
+                                    } 
+                                    else 
+                                    {
+                                        JOptionPane.showMessageDialog(
+                                            null,
+                                            "No se pudo actualizar la alerta con ID " + obtenerIdAlerta[0] + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                            "Error de Actualización",
+                                            JOptionPane.ERROR_MESSAGE
+                                        );
+                                    }
+            
+            
+                                    
+            
+                                }
+            
+                            }
+                        });
+
+
+
             // Añadir el formulario y el botón al frame
             detailFrame.setLayout(new BorderLayout());
             detailFrame.add(new JScrollPane(formPanel), BorderLayout.CENTER);
+            detailFrame.add(markAsReadButton, BorderLayout.SOUTH);
 
             // Mostrar el frame
             detailFrame.setLocationRelativeTo(null);

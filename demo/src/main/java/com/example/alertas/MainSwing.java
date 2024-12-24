@@ -2,6 +2,7 @@ package com.example.alertas;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -127,11 +128,9 @@ public class MainSwing
 
     public MainSwing(DatabaseConnection databaseConnection) 
     {
+        // Colores por defecto
 
-
-
-            // Colores por defecto
-
+        System.out.println(ModificadoresInterfaz.obtenerNombreDeUsuario());
         this.databaseConnection = databaseConnection;
 
         this.alertasConfig = new AlertasConfig(); // Inicializar AlertasConfig
@@ -163,7 +162,6 @@ public class MainSwing
             System.exit(0); // Cambiado de 0 a 1 para indicar un error
         }
 
-
         // Crear el panel principal
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -188,7 +186,6 @@ public class MainSwing
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
         sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
@@ -196,18 +193,15 @@ public class MainSwing
         // Configuración de las secciones para que ocupen menos espacio en la pantalla
         sectionsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         sectionsPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
-
 
         // Crear las secciones
         for (int i = 1; i <= 8; i++) 
         {
-
-
             String colorHex = ConfigProperties.getProperty("seccion" + i + ".color").trim();
 
-
             // Validar si el color es nulo o vacío
-            if (colorHex == null || colorHex.isEmpty()) {
+            if (colorHex == null || colorHex.isEmpty()) 
+            {
                 JOptionPane.showMessageDialog(
                     null, 
                     "El valor para 'section" + i + ".color' no está definido o está vacío en el archivo de configuración.\n" +
@@ -216,11 +210,10 @@ public class MainSwing
                     "Error en Configuración", 
                     JOptionPane.WARNING_MESSAGE
                 );
-        
+                
                 // Usar un color predeterminado
                 colorHex = "#cccccc";
             }
-
 
             JPanel sectionPanel = new JPanel(new BorderLayout());
             sectionPanel.setBackground(Color.decode(colorHex));
@@ -239,7 +232,6 @@ public class MainSwing
                     "Error en Configuración de Secciones",
                     JOptionPane.WARNING_MESSAGE
                 );
-
             }
         
             JLabel sectionLabel = new JLabel(getNameSectionFromProperties, SwingConstants.CENTER);
@@ -356,7 +348,6 @@ public class MainSwing
         sectionsPanel.revalidate();
         sectionsPanel.repaint();
 
-
         // Añadir secciones al GridBagLayout
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -377,7 +368,6 @@ public class MainSwing
         gbc.insets = new Insets(0, 0, 0, 0); // Sin márgenes
         gbc.fill = GridBagConstraints.HORIZONTAL; // Solo se expande horizontalmente
         contentPanel.add(figureLegendPanel, gbc);
-
 
         // Elimina bordes en los paneles
         sectionsPanel.setBorder(new EmptyBorder(0, 0, 0, 0)); // Sin bordes internos
@@ -447,7 +437,6 @@ public class MainSwing
                         timer.setDelay(timeForTimmerUpdated);
                         timer.start();
                     }
-
                 }
                 verifySaveMs = false;
 
@@ -476,10 +465,7 @@ public class MainSwing
                 }
 
                 //List<Object[]> alertasConPermisosAd = databaseConnection.filtrarAlertasConPermiso(alertsArray);
-
-                
-
-                                                        
+                  
                 // aqui le debo enviar ese array a otro metodo para que nos retorne el array 
 
                 /* 
@@ -600,7 +586,6 @@ public class MainSwing
                             if (showAlertsToSection) 
                             {
                                 // Array de secciones disponibles
-
                                 String extraerSeccionProceso = (String) alert[7]; // Ejemplo: acceder al proceso (posición 1)
 
                                 if (extraerSeccionProceso != null && extraerSeccionProceso.matches("[1357]")) 
@@ -618,10 +603,8 @@ public class MainSwing
                                     );      
                                     continue; // Salir del bucle actual      
                                 }
-                                
 
                                 int[] seccionesEspecificas  = { 0, 2, 4, 6};
-
                                 Map<Integer, JPanel> seccionesMap = new LinkedHashMap<>();
 
                                 for (int sectionIndex : seccionesEspecificas) 
@@ -712,7 +695,14 @@ public class MainSwing
                                        break;
 
                                     default:
-                                        throw new AssertionError();
+                                    JOptionPane.showMessageDialog(
+                                        null,
+                                        "El valor de severidad '" + severidad + "' no es válido. Por favor, asegúrate de que la severidad sea uno de los siguientes valores permitidos: 1 (Baja), 2 (Media), 3 (Alta), 4 (Crítica).",
+                                        "Error de Severidad",
+                                        JOptionPane.ERROR_MESSAGE
+                                    );
+                                    alertColor = Color.GRAY; // Establecer un color por defecto para casos inválidos
+                                    
                                 }
 
                                 
@@ -728,6 +718,9 @@ public class MainSwing
                                //Color alertColor = Color.decode(alertColorFromProperties); // Convierte el valor hexadecimal a un objeto Color
 
                                 //Seleccionar la figura basada en la configuración de la alerta
+
+                                Object alertId = alert[0]; // Primera columna
+
                                 JPanel figuraPanel;
                                         switch (figura) 
                                         {
@@ -735,6 +728,9 @@ public class MainSwing
 
                                                 figuraPanel = new FigurasDivididas.CirculoPanel(alertColor,
                                                         new Object[][] { alert });
+
+                                                figuraPanel.setName("Figura-Alerta-" + alertId); // Donde alertId es un identificador único
+
                                                 if (popupCheckBox.isSelected()) 
                                                 {
                                                     ModificadoresInterfaz.openPopupWithTable(new Object[][] { alert });
@@ -743,7 +739,10 @@ public class MainSwing
                                             case "cuadrado":
                                                 figuraPanel = new FigurasDivididas.CuadradoPanel(alertColor,
                                                         new Object[][] { alert });
-                                                if (popupCheckBox.isSelected()) {
+                                                figuraPanel.setName("Figura-Alerta-" + alertId); // Donde alertId es un identificador único
+
+                                                if (popupCheckBox.isSelected()) 
+                                                {
                                                     ModificadoresInterfaz.openPopupWithTable(new Object[][] { alert });
                                                 }
 
@@ -751,7 +750,10 @@ public class MainSwing
                                             case "triangulo":
                                                 figuraPanel = new FigurasDivididas.TrianguloPanel(alertColor,
                                                         new Object[][] { alert });
-                                                if (popupCheckBox.isSelected()) {
+                                                figuraPanel.setName("Figura-Alerta-" + alertId); // Donde alertId es un identificador único
+
+                                                if (popupCheckBox.isSelected()) 
+                                                {
                                                     ModificadoresInterfaz.openPopupWithTable(new Object[][] { alert });
                                                 }
                                                 break;
@@ -760,13 +762,13 @@ public class MainSwing
                                                 break;
                                         }
 
+
                                             // Añadir la figura al `labelsPanel` en la sección específica
                                         labelsPanel.add(figuraPanel);
                                         labelsPanel.revalidate();
                                         labelsPanel.repaint();
 
-                                        JPanel labelsPanelLeft = (JPanel) randomValue.getComponent(3); // Obtén el primer
-                                                                                                        // componente,
+                                        JPanel labelsPanelLeft = (JPanel) randomValue.getComponent(3); // Obtén el primer componente,
 
                                         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
                                         executor.schedule(() -> {
@@ -774,10 +776,10 @@ public class MainSwing
                                             labelsPanel.removeAll();
                                             labelsPanelLeft.add(figuraPanel);
                                             labelsPanelLeft.revalidate();
-                                            labelsPanelLeft.repaint();
+                                            labelsPanelLeft.repaint();                
+                                            
                                         }, 2, TimeUnit.SECONDS);
                                         executor.shutdown();
-
                             }
 
                         }
@@ -900,6 +902,11 @@ public class MainSwing
             tablesPanel.setVisible(true);
         }
 
+
+
+        
+
+        
     }
 
     // Método para mostrar el diálogo de configuración de milisegundos y opción de

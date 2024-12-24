@@ -9,7 +9,11 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +21,8 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -36,6 +42,7 @@ import javax.swing.Timer;
 
 import com.example.alertas.MainSwing;
 import com.example.alertas.configuracion.ConfigProperties;
+import com.example.alertas.figuras.FigurasDivididas;
 
 
 public class ModificadoresInterfaz 
@@ -727,4 +734,224 @@ public class ModificadoresInterfaz
                 // Retornamos el valor en la posición aleatoria
                 return values.get(randomIndex);
             }
+
+
+            public static Boolean verificarGuardadoValid = false;
+
+            public static boolean showCommentDialogForValid(Integer alertaId, String usuario) 
+            {
+                // Crear el diálogo
+                JDialog dialog = new JDialog((Frame) null, "Agregar Comentario", true);
+                dialog.setSize(400, 200);
+                dialog.setLayout(new BorderLayout());
+                dialog.setLocationRelativeTo(null);
+            
+                // Crear el panel principal
+                JPanel panel = new JPanel();
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+            
+                // Etiqueta para el comentario
+                JLabel label = new JLabel("Ingrese un comentario (máximo 80 caracteres):");
+                label.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+                // Campo de texto para el comentario
+                JTextField commentField = new JTextField();
+                commentField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+            
+                // Botón para guardar
+                JButton saveButton = new JButton("Guardar");
+                saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+                final boolean[] resultado = {false};
+            
+                saveButton.addActionListener(e -> {
+                    String comment = commentField.getText();
+                    if (comment.length() > 80) 
+                    {
+                        JOptionPane.showMessageDialog(dialog, "El comentario no debe exceder los 80 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } 
+                    else 
+                    {
+                        if (comment.length() < 1) {
+                            JOptionPane.showMessageDialog(dialog, "El comentario no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+            
+                        Boolean actualizarAlerta = MainSwing.databaseConnection.actualizarAlertaValid(alertaId, usuario, comment);
+                        if (actualizarAlerta) 
+                        {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "La alerta con ID " + alertaId + " se marcó como leída correctamente.\nUsuario: " + usuario + "\nComentario: " + comment,
+                                "Actualización Exitosa",
+                                JOptionPane.INFORMATION_MESSAGE
+                            );
+                            resultado[0] = true;
+                            dialog.dispose();
+                        } 
+                        else 
+                        {
+                            JOptionPane.showMessageDialog(
+                                null,
+                                "No se pudo actualizar la alerta con ID " + alertaId + ".\nVerifique los datos ingresados o contacte al administrador.",
+                                "Error de Actualización",
+                                JOptionPane.ERROR_MESSAGE
+                            );
+                        }
+                    }
+                });
+            
+                // Añadir componentes al panel
+                panel.add(label);
+                panel.add(Box.createRigidArea(new Dimension(0, 10)));
+                panel.add(commentField);
+                panel.add(Box.createRigidArea(new Dimension(0, 10)));
+                panel.add(saveButton);
+            
+                // Añadir panel al diálogo
+                dialog.add(panel, BorderLayout.CENTER);
+            
+                // Mostrar el diálogo
+                dialog.setVisible(true);
+            
+                // Retornar el resultado de la operación
+                return resultado[0];
+            }
+            
+
+
+            public static boolean eliminarFigurasLeidasInterfaz(Integer idAlertaFigura) 
+            {
+                boolean figuraEliminada = false;
+            
+                // Iterar sobre todas las secciones
+                for (Map.Entry<Integer, JPanel> entry : MainSwing.allSections.entrySet()) 
+                {
+                    JPanel seccionPanel = entry.getValue();
+            
+                    Component[] componentes = seccionPanel.getComponents();
+                    for (Component componente : componentes) 
+                    {
+                        if (componente instanceof JPanel) 
+                        {
+                            JPanel panel = (JPanel) componente;
+            
+                            // Buscar figuras dentro de este panel
+                            for (Component subComponente : panel.getComponents()) 
+                            {       
+                                if (subComponente instanceof FigurasDivididas.CirculoPanel ||
+                                    subComponente instanceof FigurasDivididas.CuadradoPanel ||
+                                    subComponente instanceof FigurasDivididas.TrianguloPanel) 
+                                {
+                                    // Obtener el nombre de la figura
+                                    String figuraId = subComponente.getName();
+            
+                                    if (figuraId != null && figuraId.contains(idAlertaFigura.toString())) 
+                                    {
+                                        String obtenerNombre = obtenerNombreDeUsuario();
+            
+                                        if (obtenerNombre != null) 
+                                        {
+                                            panel.remove(subComponente); // Eliminar la figura del panel
+                                            MainSwing.sectionsPanel.revalidate();
+                                            MainSwing.sectionsPanel.repaint();
+                                            figuraEliminada = true;
+                                            break; // Salir del bucle de subcomponentes
+                                        }
+                                    }
+                                }
+                            }
+            
+                            if (figuraEliminada) 
+                            {
+                                break; // Salir del bucle de componentes
+                            }
+                        }
+                    }
+            
+                    if (figuraEliminada) 
+                    {
+                        break; // Salir del bucle de secciones
+                    }
+                }
+            
+                // Si no se encontró la figura, mostrar mensaje de error
+                if (!figuraEliminada) 
+                {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "No se encontró la figura con el ID especificado: " + idAlertaFigura + ".\nPor favor, verifique los datos e intente nuevamente.",
+                        "Error desconocido al Eliminar Figura",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            
+                return figuraEliminada;
+            }
+            
+
+
+            public static String obtenerNombreDeUsuario() 
+            {
+                try 
+                {
+                    // Obtener el nombre del usuario actual de Windows
+                    String usuario = System.getProperty("user.name");
+            
+                    // Construir el comando para obtener la información del usuario
+                    String comando = "net user " + usuario;
+            
+                    // Ejecutar el comando
+                    ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", comando);
+                    builder.redirectErrorStream(true);
+                    Process process = builder.start();
+            
+                    // Leer la salida del comando
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String linea;
+                    String nombreUsuario = null; // Variable para almacenar el nombre de usuario
+            
+                    while ((linea = reader.readLine()) != null) 
+                    {
+                        // Buscar la línea que contiene "Nombre de usuario"
+                        if (linea.startsWith("Nombre de usuario")) 
+                        {
+                            // Extraer el valor después de "Nombre de usuario"
+                            nombreUsuario = linea.substring("Nombre de usuario".length()).trim();
+                            break; // Salimos del bucle al encontrarlo
+                        }
+                    }
+
+                    reader.close();
+            
+                    // Retornar el nombre de usuario
+                    if (nombreUsuario != null) 
+                    {
+                        return nombreUsuario;
+                    } 
+                    else 
+                    {
+                        JOptionPane.showMessageDialog(null, "No se pudo encontrar el nombre de usuario.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                        return null;
+                    }
+                } 
+                catch (Exception e) 
+                {
+
+                    JOptionPane.showMessageDialog(null, 
+                    "Ha ocurrido un error inesperado al intentar obtener el nombre de usuario.\n\n"
+                    + "Detalles técnicos: " + e.getMessage() + "\n\n"
+                    + "Sugerencia: Verifica que el sistema operativo sea compatible y que tienes permisos adecuados.",
+                    "Error Crítico", 
+                    JOptionPane.ERROR_MESSAGE);
+                    return null;
+
+                }
+            }
+            
+            
+
+
 }
