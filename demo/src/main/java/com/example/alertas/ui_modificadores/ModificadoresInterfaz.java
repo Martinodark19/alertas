@@ -781,12 +781,7 @@ public class ModificadoresInterfaz
                         Boolean actualizarAlerta = MainSwing.databaseConnection.actualizarAlertaValid(alertaId, usuario, comment);
                         if (actualizarAlerta) 
                         {
-                            JOptionPane.showMessageDialog(
-                                null,
-                                "La alerta con ID " + alertaId + " se marcó como leída correctamente.\nUsuario: " + usuario + "\nComentario: " + comment,
-                                "Actualización Exitosa",
-                                JOptionPane.INFORMATION_MESSAGE
-                            );
+
                             resultado[0] = true;
                             dialog.dispose();
                         } 

@@ -602,17 +602,29 @@ public class FigurasDivididas
                                     if (mostrarDialogo) 
                                     {
                                         Boolean eliminarFigura = ModificadoresInterfaz.eliminarFigurasLeidasInterfaz(obtenerIdAlerta[0]);
-                                        if (eliminarFigura) 
+
+                                        if(eliminarFigura)
                                         {
                                             JOptionPane.showMessageDialog(
                                                 null,
-                                                "La alerta con ID " + obtenerIdAlerta[0] + " se marco como leida correctamente.\nUsuario: " + obtenerUsuario,
+                                                "La alerta  se marcó como leída correctamente.",
                                                 "Actualización Exitosa",
                                                 JOptionPane.INFORMATION_MESSAGE
                                             );
-            
-                                            detailFrame.dispose();
+
                                         }
+                                        else
+                                        {
+                                            JOptionPane.showMessageDialog(
+                                                null,
+                                                "Ha ocurrido un error inesperado al momento de marcar como leidas las figuras",
+                                                "Error",
+                                                JOptionPane.ERROR_MESSAGE
+                                            );
+                                        }
+
+                                        detailFrame.dispose();
+                                        
                                     }
                                     else
                                     {
