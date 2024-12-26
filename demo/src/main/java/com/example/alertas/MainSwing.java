@@ -77,6 +77,8 @@ public class MainSwing
     // inicializacion de paneles
     private JPanel figuresPanel;
     private JPanel figuresPanelLeft;
+    private JPanel figuresPanelLeft2;
+    private JPanel figuresPanelLeft3;
     private JPanel labelsPanel;
 
     // timer para la actualizacion de la tabla basada en los MS
@@ -233,7 +235,7 @@ public class MainSwing
                     JOptionPane.WARNING_MESSAGE
                 );
             }
-        
+                            
             JLabel sectionLabel = new JLabel(getNameSectionFromProperties, SwingConstants.CENTER);
             sectionLabel.setFont(new Font("Arial", Font.PLAIN, 12)); // Reducimos la fuente
 
@@ -256,6 +258,10 @@ public class MainSwing
             figuresPanelLeft.setLayout(new BoxLayout(figuresPanelLeft, BoxLayout.X_AXIS));
             figuresPanelLeft.setMinimumSize(new Dimension(47, 47));
             figuresPanelLeft.setMaximumSize(new Dimension(47, 47));
+            
+
+            
+            
 
             // Botón de Cambiar Color
             JButton changeColorButton = new JButton("Cambiar Color");
@@ -322,6 +328,7 @@ public class MainSwing
             allSections.put(i, sectionPanel);
         }
 
+        
         String verificarIniciadoSecciones = ConfigProperties.getProperty("app.sections").trim();
 
         if (!verificarIniciadoSecciones.equals("8")  && !verificarIniciadoSecciones.equals("4")) 
@@ -901,12 +908,7 @@ public class MainSwing
         {
             tablesPanel.setVisible(true);
         }
-
-
-
-        
-
-        
+    
     }
 
     // Método para mostrar el diálogo de configuración de milisegundos y opción de
@@ -915,15 +917,4 @@ public class MainSwing
 
         // Define un mapa para almacenar las secciones eliminadas
         public static Map<Integer, JPanel> removedSectionsMap = new LinkedHashMap<>();
-
-
-
-
-
-
-
-
-
-
-
 }
